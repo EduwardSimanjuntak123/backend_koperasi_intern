@@ -13,6 +13,7 @@ func Run(db *gorm.DB) error {
 
 		&models.Category{},
 		&models.Product{},
+		&models.User{},
 	)
 
 	if err != nil {

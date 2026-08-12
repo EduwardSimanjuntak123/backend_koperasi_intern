@@ -29,7 +29,7 @@ type Product struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Categories []Category `gorm:"many2many:product_categories;" json:"categories"`
-	ShopID     uint       `gorm:"not null" json:"shop_id"`
-	Shop       Shop       `gorm:"foreignKey:ShopID" json:"shop"`
+	Categories []CategoryProduct `gorm:"many2many:product_categories;" json:"categories"`
+	StoreID    uint              `gorm:"not null" json:"store_id"`
+	Store      Store             `gorm:"foreignKey:StoreID" json:"store"`
 }

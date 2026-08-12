@@ -11,13 +11,20 @@ import (
 func Run(db *gorm.DB) error {
 	err := db.AutoMigrate(
 
-		&models.Category{},
+		&models.CategoryProduct{},
 		&models.User{},
-		&models.Shop{},
+		&models.Store{},
+		&models.StoreMember{},
+		&models.Roles{},
 		&models.Product{},
 		&models.Cart{},
 		&models.Cart_Item{},
 		&models.Favorite{},
+		&models.PointLocation{},
+		&models.PaymentMethod{},
+
+		&models.Order{},
+		&models.Order_Item{},
 	)
 
 	if err != nil {

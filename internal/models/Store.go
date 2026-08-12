@@ -2,9 +2,9 @@ package models
 
 import "time"
 
-type Shop struct {
+type Store struct {
 	ID          uint      `gorm:"primaryKey" json:"id"`
-	Name_Shop   string    `gorm:"not null" json:"name"`
+	NameStore   string    `gorm:"not null" json:"name"`
 	Description string    `gorm:"not null" json:"description"`
 	Logo        string    `gorm:"not null" json:"logo"`
 	CreatedAt   time.Time `json:"created_at"`

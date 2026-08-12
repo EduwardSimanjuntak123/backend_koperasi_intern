@@ -1,13 +1,14 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
-type Category struct {
+type Roles struct {
 	ID        uint      `gorm:"primaryKey" json:"id"`
 	Name      string    `gorm:"not null" json:"name"`
-	Slug      string    `gorm:"unique;not null" json:"slug"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-
-	Products []Product `gorm:"many2many:product_categories;" json:"-"`
+	StoreID   uint      `gorm:"not null" json:"store_id"`
+	Store     Store     `gorm:"foreignKey:StoreID" json:"store"`
 }

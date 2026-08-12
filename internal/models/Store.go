@@ -12,3 +12,7 @@ type Store struct {
 	UserID      uint      `gorm:"not null" json:"user_id"`
 	User        User      `gorm:"foreignKey:UserID" json:"user"`
 }
+
+func (Shop) TableName() string {
+	return "shop"
+}

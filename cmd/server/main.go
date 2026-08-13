@@ -59,6 +59,10 @@ func main() {
 	storeMemberService := services.NewStoreMemberService(storeMemberRepo)
 	storeMemberController := controllers.NewStoreMemberController(storeMemberService)
 
+	favoriteRepo := repositories.NewFavoriteRepository(db)
+	favoriteService := services.NewFavoriteService(favoriteRepo)
+	favoriteController := controllers.NewFavoriteController(favoriteService)	
+
 	routes.RegisterRoutes(
 		r,
 		productController,
@@ -67,6 +71,7 @@ func main() {
 		rolesController,
 		storeController,
 		storeMemberController,
+		favoriteController,
 	)
 
 	// Run server

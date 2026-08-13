@@ -14,6 +14,8 @@ func RegisterRoutes(
 	rolesController *controllers.RolesController,
 	storeController *controllers.StoreController,
 	storeMemberController *controllers.StoreMemberController,
+	favoriteController *controllers.FavoriteController,
+	
 ) {
 
 	api := router.Group("/api/v1")
@@ -24,4 +26,5 @@ func RegisterRoutes(
 	RegisterRoleRoutes(api, rolesController)
 	RegisterStoreRoutes(api, storeController)
 	RegisterStoreMemberRoutes(api, storeMemberController)
+	RegisterFavoriteRoutes(api, favoriteController)
 }

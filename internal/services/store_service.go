@@ -42,9 +42,6 @@ func (s *StoreService) Create(store *models.Store) error {
 	if strings.TrimSpace(store.Logo) == "" {
 		return errors.New("store logo is required")
 	}
-	if store.ID == 0 {
-		return errors.New("store id is required")
-	}
 
 	return s.storeRepo.Create(store)
 }

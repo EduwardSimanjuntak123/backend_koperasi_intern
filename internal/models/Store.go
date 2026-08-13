@@ -13,6 +13,6 @@ type Store struct {
 	User        User      `gorm:"foreignKey:UserID" json:"user"`
 }
 
-func (Shop) TableName() string {
-	return "shop"
+func (Store) TableName() string {
+	return "stores"
 }

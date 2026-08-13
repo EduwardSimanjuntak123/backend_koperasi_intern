@@ -51,12 +51,22 @@ func main() {
 	rolesService := services.NewRolesService(rolesRepo)
 	rolesController := controllers.NewRolesController(rolesService)
 
+	storeRepo := repositories.NewStoreRepository(db)
+	storeService := services.NewStoreService(storeRepo)
+	storeController := controllers.NewStoreController(storeService)
+
+	storeMemberRepo := repositories.NewStoreMemberRepository(db)
+	storeMemberService := services.NewStoreMemberService(storeMemberRepo)
+	storeMemberController := controllers.NewStoreMemberController(storeMemberService)
+
 	routes.RegisterRoutes(
 		r,
 		productController,
 		categoryController,
 		userController,
 		rolesController,
+		storeController,
+		storeMemberController,
 	)
 
 	// Run server

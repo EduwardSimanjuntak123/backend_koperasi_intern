@@ -12,6 +12,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 	Stores    []Store   `gorm:"foreignKey:UserID" json:"stores,omitempty"`
+	Favorites []Product `gorm:"many2many:user_favorites;" json:"favorites"`
 }
 
 func (User) TableName() string {

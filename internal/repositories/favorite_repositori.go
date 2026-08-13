@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"errors"
+
 	"backend_koperasi/internal/models"
 
 	"gorm.io/gorm"
@@ -17,72 +18,75 @@ func NewFavoriteRepository(db *gorm.DB) *FavoriteRepository {
 	}
 }
 
-// ==============================================================
-// Mengambil wadah favorit milik user beserta daftar produknya
-// ==============================================================
-func (r *FavoriteRepository) FindByUserID(userID uint) (*models.Favorite, error) {
-	var favorite models.Favorite
+// ======================================================
+// Mengambil seluruh favorit milik user
+// ======================================================
 
-	// Menggunakan Preload("Products") untuk mengambil isi produk sekaligus
-	err := r.db.Preload("Products").Where("user_id = ?", userID).First(&favorite).Error
-	if err != nil {
-		return nil, err
-	}
+func (r *FavoriteRepository) FindByUserID(userID uint) ([]models.Favorite, error) {
+	var favorites []models.Favorite
 
-	return &favorite, nil
+	err := r.db.
+		Preload("Product").
+		Where("user_id = ?", userID).
+		Find(&favorites).Error
+
+	return favorites, err
 }
 
-// ==============================================================
-// Mengecek apakah sebuah produk sudah ada di favorit user
-// ==============================================================
-func (r *FavoriteRepository) CheckIfExists(userID uint, productID uint) (bool, error) {
-	var favorite models.Favorite
+// ======================================================
+// Mengecek apakah produk sudah difavoritkan
+// ======================================================
 
-	// Cari favorit user dulu
-	err := r.db.Where("user_id = ?", userID).First(&favorite).Error
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return false, nil // Jika wadah favorit belum ada, berarti produk juga belum ada
-		}
-		return false, err
-	}
+func (r *FavoriteRepository) CheckIfExists(userID, productID uint) (bool, error) {
+	var count int64
 
-	// Cari apakah di dalam wadah favorit tersebut ada productID yang dimaksud
-	var products []models.Product
-	err = r.db.Model(&favorite).Where("id = ?", productID).Association("Products").Find(&products)
+	err := r.db.Model(&models.Favorite{}).
+		Where("user_id = ? AND product_id = ?", userID, productID).
+		Count(&count).Error
 
-	return len(products) > 0, err
+	return count > 0, err
 }
 
-// ==============================================================
-// Menambahkan produk ke favorit user (relasi Many-to-Many)
-// ==============================================================
-func (r *FavoriteRepository) AddProduct(userID uint, productID uint) error {
-	var favorite models.Favorite
+// ======================================================
+// Menambahkan produk ke favorit
+// ======================================================
 
-	// FirstOrCreate: Cari wadah favoritnya, jika belum ada, buatkan baru untuk user ini
-	err := r.db.FirstOrCreate(&favorite, models.Favorite{UserID: userID}).Error
+func (r *FavoriteRepository) AddProduct(userID, productID uint) error {
+
+	exists, err := r.CheckIfExists(userID, productID)
 	if err != nil {
 		return err
 	}
 
-	// Masukkan productID ke dalam tabel perantara (pivot table)
-	product := models.Product{ID: productID}
-	return r.db.Model(&favorite).Association("Products").Append(&product)
-}
-
-// ==============================================================
-// Menghapus produk dari favorit user
-// ==============================================================
-func (r *FavoriteRepository) RemoveProduct(userID uint, productID uint) error {
-	var favorite models.Favorite
-
-	err := r.db.Where("user_id = ?", userID).First(&favorite).Error
-	if err != nil {
-		return err // Error atau tidak ditemukan
+	if exists {
+		return errors.New("product already in favorites")
 	}
 
-	// Hapus productID dari tabel perantara relasi
-	product := models.Product{ID: productID}
-	return r.db.Model(&favorite).Association("Products").Delete(&product)
+	favorite := models.Favorite{
+		UserID:    userID,
+		ProductID: productID,
+	}
+
+	return r.db.Create(&favorite).Error
+}
+
+// ======================================================
+// Menghapus produk dari favorit
+// ======================================================
+
+func (r *FavoriteRepository) RemoveProduct(userID, productID uint) error {
+
+	result := r.db.
+		Where("user_id = ? AND product_id = ?", userID, productID).
+		Delete(&models.Favorite{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return errors.New("favorite not found")
+	}
+
+	return nil
 }

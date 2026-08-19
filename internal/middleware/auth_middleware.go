@@ -34,6 +34,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		// Simpan data user ke context
 		c.Set("user_id", claims.UserID)
 		c.Set("email", claims.Email)
+		c.Set("role_id", claims.RoleID)
 
 		c.Next()
 	}

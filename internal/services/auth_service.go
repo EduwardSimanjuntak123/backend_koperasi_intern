@@ -107,7 +107,7 @@ func (s *AuthService) Login(email, password string) (string, *models.User, error
 	}
 
 	// Generate JWT
-	token, err := utils.GenerateToken(user.ID, user.Email)
+	token, err := utils.GenerateToken(user.ID, user.Email, user.RoleID)
 	if err != nil {
 		return "", nil, err
 	}

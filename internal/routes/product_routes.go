@@ -2,6 +2,7 @@ package routes
 
 import (
 	"backend_koperasi/internal/controllers"
+	"backend_koperasi/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,13 +12,16 @@ func RegisterProductRoutes(
 	router *gin.RouterGroup,
 	productController *controllers.ProductController,
 ) {
-
-	product := router.Group("/products")
+	router.GET("/products", productController.GetAll)
+	router.GET("/products/:id", productController.GetByID)
+	admin := router.Group("/products")
+	admin.Use(
+		middleware.AuthMiddleware(),
+		middleware.AdminMiddleware(),
+	)
 	{
-		product.GET("", productController.GetAll)
-		product.GET("/:id", productController.GetByID)
-		product.POST("", productController.Create)
-		product.PUT("/:id", productController.Update)
-		product.DELETE("/:id", productController.Delete)
+		admin.POST("", productController.Create)
+		admin.PUT("/:id", productController.Update)
+		admin.DELETE("/:id", productController.Delete)
 	}
 }

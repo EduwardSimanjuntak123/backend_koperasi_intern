@@ -2,22 +2,29 @@ package routes
 
 import (
 	"backend_koperasi/internal/controllers"
+	"backend_koperasi/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterCategoryRoutes mendaftarkan seluruh endpoint Category.
 func RegisterCategoryRoutes(
 	router *gin.RouterGroup,
 	categoryController *controllers.CategoryProductController,
 ) {
 
-	category := router.Group("/categories")
+	// Public
+	router.GET("/categories", categoryController.GetAll)
+	router.GET("/categories/:id", categoryController.GetByID)
+
+	// Admin Only
+	admin := router.Group("/categories")
+	admin.Use(
+		middleware.AuthMiddleware(),
+		middleware.AdminMiddleware(),
+	)
 	{
-		category.GET("", categoryController.GetAll)
-		category.GET("/:id", categoryController.GetByID)
-		category.POST("", categoryController.Create)
-		category.PUT("/:id", categoryController.Update)
-		category.DELETE("/:id", categoryController.Delete)
+		admin.POST("", categoryController.Create)
+		admin.PUT("/:id", categoryController.Update)
+		admin.DELETE("/:id", categoryController.Delete)
 	}
 }

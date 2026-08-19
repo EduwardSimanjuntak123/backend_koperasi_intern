@@ -48,6 +48,30 @@ func (s *ProductService) Create(product *models.Product) error {
 	if product.Stock < 0 {
 		return errors.New("stock cannot be negative")
 	}
+	if product.OriginalPrice != nil && *product.OriginalPrice < 0 {
+		return errors.New("original price must be greater than or equal to 0")
+	}
+	if product.WeightGram != nil && *product.WeightGram < 0 {
+		return errors.New("weight cannot be negative")
+	}
+	if product.LengthCm != nil && *product.LengthCm < 0 {
+		return errors.New("length cannot be negative")
+	}
+	if product.WidthCm != nil && *product.WidthCm < 0 {
+		return errors.New("width cannot be negative")
+	}
+	if product.HeightCm != nil && *product.HeightCm < 0 {
+		return errors.New("height cannot be negative")
+	}
+	if product.BrandID == nil {
+		return errors.New("brand id is required")
+	}
+	if product.UnitID == nil {
+		return errors.New("unit id is required")
+	}
+	if product.CategoryID == nil {
+		return errors.New("category id is required")
+	}
 
 	return s.productRepo.Create(product)
 }

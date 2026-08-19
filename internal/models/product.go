@@ -57,13 +57,10 @@ type Product struct {
 	BrandID *uint  `json:"brand_id"`
 	Brand   *Brand `gorm:"foreignKey:BrandID" json:"brand"`
 
-	UnitID *uint `json:"unit_id"`
-	Unit   *Unit `gorm:"foreignKey:UnitID" json:"unit"`
-
-	SupplierID *uint     `json:"supplier_id"`
-	Supplier   *Supplier `gorm:"foreignKey:SupplierID" json:"supplier"`
-
-	Categories []CategoryProduct `gorm:"many2many:product_categories;" json:"categories"`
+	UnitID     *uint            `json:"unit_id"`
+	Unit       *Unit            `gorm:"foreignKey:UnitID" json:"unit"`
+	CategoryID *uint            `json:"category_id"`
+	Category   *CategoryProduct `gorm:"foreignKey:CategoryID" json:"category"`
 
 	Favorites []Product `gorm:"many2many:user_favorites;"`
 

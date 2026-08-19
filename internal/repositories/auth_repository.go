@@ -39,7 +39,7 @@ func (r *AuthRepository) FindByID(id uint) (*models.User, error) {
 
 	var user models.User
 
-	err := r.db.First(&user, id).Error
+	err := r.db.Preload("Role").First(&user, id).Error
 
 	if err != nil {
 		return nil, err

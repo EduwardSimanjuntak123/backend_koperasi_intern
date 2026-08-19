@@ -85,6 +85,7 @@ func main() {
 	storeRepo := repositories.NewStoreRepository(db)
 	storeMemberRepo := repositories.NewStoreMemberRepository(db)
 	favoriteRepo := repositories.NewFavoriteRepository(db)
+	cartRepo := repositories.NewCartRepository(db)
 
 	// ==============================
 	// Service
@@ -97,6 +98,7 @@ func main() {
 	storeService := services.NewStoreService(storeRepo)
 	storeMemberService := services.NewStoreMemberService(storeMemberRepo)
 	favoriteService := services.NewFavoriteService(favoriteRepo)
+	cartService := services.NewCartService(cartRepo)
 
 	// ==============================
 	// Controller
@@ -109,6 +111,7 @@ func main() {
 	storeController := controllers.NewStoreController(storeService)
 	storeMemberController := controllers.NewStoreMemberController(storeMemberService)
 	favoriteController := controllers.NewFavoriteController(favoriteService)
+	cartController := controllers.NewCartController(cartService)
 
 	// ==============================
 	// Routes
@@ -124,6 +127,7 @@ func main() {
 		storeMemberController,
 		favoriteController,
 		authController,
+		cartController,
 	)
 
 	// ==============================

@@ -18,7 +18,7 @@ func Run(db *gorm.DB) error {
 		&models.Roles{},
 		&models.Product{},
 		&models.Cart{},
-		&models.Cart_Item{},
+		&models.CartItem{},
 		&models.Favorite{},
 		&models.PointLocation{},
 		&models.PaymentMethod{},

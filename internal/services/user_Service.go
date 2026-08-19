@@ -67,6 +67,9 @@ func (s *UserService) Create(user *models.User) error {
 	if strings.TrimSpace(user.NoHP) == "" {
 		return errors.New("phone number is required")
 	}
+	if user.RoleID == 0 {
+		return errors.New("role id is required")
+	}
 
 	// Username sudah digunakan?
 	existingUsername, _ := s.userRepo.FindByUsername(user.Username)
@@ -111,6 +114,7 @@ func (s *UserService) Update(id uint, user *models.User) error {
 	existing.Username = user.Username
 	existing.Email = user.Email
 	existing.NoHP = user.NoHP
+	existing.RoleID = user.RoleID
 
 	// Update password hanya jika diisi
 	if strings.TrimSpace(user.Password) != "" {

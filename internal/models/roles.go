@@ -9,7 +9,5 @@ type Roles struct {
 	Name      string    `gorm:"not null" json:"name"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	StoreID   uint      `gorm:"not null" json:"store_id"`
-	Store     Store     `gorm:"foreignKey:StoreID" json:"store"`
 	Users     []User    `gorm:"foreignKey:RoleID" json:"users,omitempty"`
 }

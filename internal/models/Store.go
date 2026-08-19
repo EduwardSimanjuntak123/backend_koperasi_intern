@@ -7,6 +7,8 @@ type Store struct {
 	NameStore   string    `gorm:"not null" json:"name"`
 	Description string    `gorm:"not null" json:"description"`
 	Logo        string    `gorm:"not null" json:"logo"`
+	UserID      uint      `gorm:"not null" json:"user_id"`
+	User        User      `gorm:"foreignKey:UserID" json:"user"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

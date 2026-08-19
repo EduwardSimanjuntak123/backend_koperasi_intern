@@ -36,9 +36,6 @@ func (s *RolesService) Create(roles *models.Roles) error {
 	if strings.TrimSpace(roles.Name) == "" {
 		return errors.New("Roles name is required")
 	}
-	if roles.StoreID == 0 {
-		return errors.New("store id is required")
-	}
 
 	return s.RolesRepo.Create(roles)
 }
@@ -52,7 +49,6 @@ func (s *RolesService) Update(id uint, roles *models.Roles) error {
 	}
 
 	existing.Name = roles.Name
-	existing.StoreID = roles.StoreID
 
 	return s.RolesRepo.Update(existing)
 }

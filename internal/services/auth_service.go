@@ -46,6 +46,9 @@ func (s *AuthService) Register(user *models.User) error {
 	if len(user.Password) < 8 {
 		return errors.New("password minimum 8 karakter")
 	}
+	if user.RoleID == 0 {
+		return errors.New("role id is required")
+	}
 
 	// cek email sudah digunakan
 	_, err := s.authRepo.FindByEmail(user.Email)

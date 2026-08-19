@@ -41,6 +41,7 @@ func (ac *AuthController) Register(c *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 		NoHP:     req.NoHP,
+		RoleID:   req.RoleID,
 	}
 
 	if err := ac.authService.Register(&user); err != nil {

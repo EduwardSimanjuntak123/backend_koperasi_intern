@@ -64,7 +64,7 @@ func (s *UserService) Create(user *models.User) error {
 		return errors.New("password is required")
 	}
 
-	if strings.TrimSpace(user.No_hp) == "" {
+	if strings.TrimSpace(user.NoHP) == "" {
 		return errors.New("phone number is required")
 	}
 
@@ -110,7 +110,7 @@ func (s *UserService) Update(id uint, user *models.User) error {
 	existing.Name = user.Name
 	existing.Username = user.Username
 	existing.Email = user.Email
-	existing.No_hp = user.No_hp
+	existing.NoHP = user.NoHP
 
 	// Update password hanya jika diisi
 	if strings.TrimSpace(user.Password) != "" {

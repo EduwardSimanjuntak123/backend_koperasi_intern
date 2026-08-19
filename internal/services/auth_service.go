@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"backend_koperasi/internal/models"
@@ -89,9 +90,15 @@ func (s *AuthService) Login(email, password string) (string, *models.User, error
 		}
 		return "", nil, err
 	}
-
+	fmt.Println("======================")
+	fmt.Println("Input Email :", email)
+	fmt.Println("Input Password :", password)
+	fmt.Println("DB Email :", user.Email)
+	fmt.Println("DB Hash :", user.Password)
 	// Cek password
 	err = utils.CheckPassword(password, user.Password)
+	fmt.Println("Compare Error :", err)
+	fmt.Println("======================")
 	if err != nil {
 		return "", nil, errors.New("email atau password salah")
 	}

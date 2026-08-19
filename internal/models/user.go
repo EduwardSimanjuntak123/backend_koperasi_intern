@@ -11,10 +11,12 @@ type User struct {
 	NoHP      string    `gorm:"uniqueIndex;not null" json:"no_hp"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	RoleID    uint      `gorm:"not null" json:"role_id"`
+	Role      Roles     `gorm:"foreignKey:RoleID" json:"role"`
 	Stores    []Store   `gorm:"foreignKey:UserID" json:"stores,omitempty"`
 	Favorites []Product `gorm:"many2many:user_favorites;" json:"favorites"`
 }
 
 func (User) TableName() string {
-	return "user"
+	return "users"
 }

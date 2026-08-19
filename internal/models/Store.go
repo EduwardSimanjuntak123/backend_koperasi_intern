@@ -9,8 +9,6 @@ type Store struct {
 	Logo        string    `gorm:"not null" json:"logo"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
-	UserID      uint      `gorm:"not null" json:"user_id"`
-	User        User      `gorm:"foreignKey:UserID" json:"user"`
 }
 
 func (Store) TableName() string {

@@ -11,4 +11,5 @@ type Roles struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	StoreID   uint      `gorm:"not null" json:"store_id"`
 	Store     Store     `gorm:"foreignKey:StoreID" json:"store"`
+	Users     []User    `gorm:"foreignKey:RoleID" json:"users,omitempty"`
 }

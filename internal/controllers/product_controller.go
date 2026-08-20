@@ -81,11 +81,19 @@ func (c *ProductController) Create(ctx *gin.Context) {
 		})
 		return
 	}
+	createdProduct, err := c.productService.GetByID(product.ID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"success": false,
+			"message": "Failed to retrieve created product",
+		})
+		return
+	}
 
 	ctx.JSON(http.StatusCreated, gin.H{
 		"success": true,
 		"message": "Product created successfully",
-		"data":    product,
+		"data":    createdProduct,
 	})
 }
 

@@ -30,6 +30,32 @@ func (s *ProductService) GetByID(id uint) (*models.Product, error) {
 
 	return s.productRepo.FindByID(id)
 }
+func IsValidBadge(badge *models.ProductBadge) bool {
+	if badge == nil {
+		return true // badge boleh kosong
+	}
+
+	switch *badge {
+	case models.BadgeNew,
+		models.BadgeBestSeller:
+		return true
+	default:
+		return false
+	}
+}
+
+func IsValidInventoryMovement(movement *models.InventoryMovement) bool {
+	if movement == nil {
+		return true // movement boleh kosong
+	}
+	switch *movement {
+	case models.FastMoving,
+		models.SlowMoving:
+		return true
+	default:
+		return false
+	}
+}
 
 func (s *ProductService) Create(product *models.Product) error {
 
@@ -48,21 +74,7 @@ func (s *ProductService) Create(product *models.Product) error {
 	if product.Stock < 0 {
 		return errors.New("stock cannot be negative")
 	}
-	if product.OriginalPrice != nil && *product.OriginalPrice < 0 {
-		return errors.New("original price must be greater than or equal to 0")
-	}
-	if product.WeightGram != nil && *product.WeightGram < 0 {
-		return errors.New("weight cannot be negative")
-	}
-	if product.LengthCm != nil && *product.LengthCm < 0 {
-		return errors.New("length cannot be negative")
-	}
-	if product.WidthCm != nil && *product.WidthCm < 0 {
-		return errors.New("width cannot be negative")
-	}
-	if product.HeightCm != nil && *product.HeightCm < 0 {
-		return errors.New("height cannot be negative")
-	}
+
 	if product.BrandID == nil {
 		return errors.New("brand id is required")
 	}
@@ -71,6 +83,20 @@ func (s *ProductService) Create(product *models.Product) error {
 	}
 	if product.CategoryID == nil {
 		return errors.New("category id is required")
+	}
+	if product.Badge != nil {
+		switch *product.Badge {
+		case models.BadgeNew, models.BadgeBestSeller:
+		default:
+			return errors.New("badge tidak sesuai dengan enum yang tersedia")
+		}
+	}
+	if product.InventoryMovement != nil {
+		switch *product.InventoryMovement {
+		case models.FastMoving, models.SlowMoving:
+		default:
+			return errors.New("inventory movement tidak sesuai dengan enum yang tersedia")
+		}
 	}
 
 	return s.productRepo.Create(product)
@@ -88,13 +114,7 @@ func (s *ProductService) Update(id uint, product *models.Product) error {
 	existing.Slug = product.Slug
 	existing.Image = product.Image
 	existing.Price = product.Price
-	existing.OriginalPrice = product.OriginalPrice
 	existing.Stock = product.Stock
-	existing.Volume = product.Volume
-	existing.WeightGram = product.WeightGram
-	existing.LengthCm = product.LengthCm
-	existing.WidthCm = product.WidthCm
-	existing.HeightCm = product.HeightCm
 	existing.Badge = product.Badge
 
 	return s.productRepo.Update(existing)

@@ -137,6 +137,9 @@ func main() {
 		unitController,
 		brandController,
 	)
+	// if err := migrations.SeedProductsFromExcel(db, "assets/products.xlsx"); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// ==============================
 	// Run Server

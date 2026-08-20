@@ -29,7 +29,6 @@ type Product struct {
 	// Price
 	Price          float64  `gorm:"not null" json:"price"`           // Selling Price
 	PurchasePrice  float64  `gorm:"default:0" json:"purchase_price"` // Harga beli
-	OriginalPrice  *float64 `json:"original_price"`
 	PromotionPrice *float64 `json:"promotion_price"`
 
 	// Stock
@@ -38,15 +37,8 @@ type Product struct {
 	MaxStock *int `json:"max_stock"`
 
 	// Inventory
-	InventoryMovement InventoryMovement `gorm:"default:'FAST_MOVING'" json:"inventory_movement"`
-	ExpiredDate       *time.Time        `json:"expired_date"`
-
-	// Dimension
-	Volume     string   `json:"volume"`
-	WeightGram *int     `json:"weight_gram"`
-	LengthCm   *float64 `json:"length_cm"`
-	WidthCm    *float64 `json:"width_cm"`
-	HeightCm   *float64 `json:"height_cm"`
+	InventoryMovement *InventoryMovement `gorm:"default:'FAST_MOVING'" json:"inventory_movement"`
+	ExpiredDate       *time.Time         `json:"expired_date"`
 
 	Badge *ProductBadge `json:"badge"`
 

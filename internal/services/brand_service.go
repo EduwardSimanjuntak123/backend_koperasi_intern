@@ -45,6 +45,9 @@ func (s *BrandService) Create(brand *models.Brand) error {
 	if strings.TrimSpace(brand.Name) == "" {
 		return errors.New("brand name is required")
 	}
+	if strings.TrimSpace(brand.Slug) == "" {
+		return errors.New("brand slug is required")
+	}
 
 	return s.brandRepo.Create(brand)
 }

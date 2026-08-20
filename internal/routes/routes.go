@@ -17,6 +17,8 @@ func RegisterRoutes(
 	favoriteController *controllers.FavoriteController,
 	authController *controllers.AuthController,
 	cartController *controllers.CartController,
+	unitController *controllers.UnitController,
+	brandController *controllers.BrandController,
 ) {
 
 	api := router.Group("/api/v1")
@@ -30,4 +32,7 @@ func RegisterRoutes(
 	RegisterFavoriteRoutes(api, favoriteController)
 	RegisterAuthRoutes(api, authController)
 	RegisterCartRoutes(api, cartController)
+	RegisterBrandRoutes(api, brandController)
+	RegisterUnitRoutes(api, unitController)
+
 }

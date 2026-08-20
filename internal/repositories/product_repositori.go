@@ -21,7 +21,10 @@ func (r *ProductRepository) FindAll() ([]models.Product, error) {
 	var products []models.Product
 
 	err := r.db.
-		Preload("Categories").
+		Preload("Category").
+		Preload("Brand").
+		Preload("Unit").
+		Preload("Store").
 		Find(&products).Error
 
 	if err != nil {
@@ -36,7 +39,10 @@ func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
 	var product models.Product
 
 	err := r.db.
-		Preload("Categories").
+		Preload("Category").
+		Preload("Brand").
+		Preload("Unit").
+		Preload("Store").
 		First(&product, id).Error
 
 	if err != nil {

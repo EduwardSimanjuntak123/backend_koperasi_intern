@@ -57,7 +57,11 @@ func (c *ProductController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, product)
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Product retrieved successfully",
+		"data":    product,
+	})
 }
 
 func (c *ProductController) Create(ctx *gin.Context) {
@@ -78,7 +82,11 @@ func (c *ProductController) Create(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusCreated, product)
+	ctx.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Product created successfully",
+		"data":    product,
+	})
 }
 
 func (c *ProductController) Update(ctx *gin.Context) {
@@ -109,7 +117,8 @@ func (c *ProductController) Update(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "updated successfully",
+		"success": true,
+		"message": "Product updated successfully",
 	})
 }
 
@@ -132,6 +141,7 @@ func (c *ProductController) Delete(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "deleted successfully",
+		"success": true,
+		"message": "Product deleted successfully",
 	})
 }

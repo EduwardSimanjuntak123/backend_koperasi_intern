@@ -2,19 +2,26 @@ package routes
 
 import (
 	"backend_koperasi/internal/controllers"
+	"backend_koperasi/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterFavoriteRoutes mendaftarkan seluruh endpoint Favorite.
 func RegisterFavoriteRoutes(
-	router *gin.RouterGroup,
+	api *gin.RouterGroup,
 	favoriteController *controllers.FavoriteController,
 ) {
-	favorite := router.Group("/favorites")
+
+	favorite := api.Group("/favorites")
+
+	favorite.Use(
+		middleware.AuthMiddleware(),
+		middleware.BuyerMiddleware(),
+	)
+
 	{
-		favorite.GET("/user/:user_id", favoriteController.GetUserFavorites)
+		favorite.GET("", favoriteController.GetUserFavorites)
 		favorite.POST("", favoriteController.AddToFavorite)
-		favorite.DELETE("/user/:user_id/product/:product_id", favoriteController.RemoveFromFavorite)
+		favorite.DELETE("/:product_id", favoriteController.RemoveFromFavorite)
 	}
 }

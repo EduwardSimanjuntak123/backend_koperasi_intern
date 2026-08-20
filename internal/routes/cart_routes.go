@@ -11,15 +11,17 @@ func RegisterCartRoutes(
 	api *gin.RouterGroup,
 	cartController *controllers.CartController,
 ) {
-	// Membuat grup route "/cart"
-	cartRoutes := api.Group("/cart")
-	
-	// Menerapkan AuthMiddleware agar hanya user yang sudah login yang bisa mengakses
-	cartRoutes.Use(middleware.AuthMiddleware())
+	cart := api.Group("/cart")
+
+	cart.Use(
+		middleware.AuthMiddleware(),
+		middleware.BuyerMiddleware(),
+	)
+
 	{
-		cartRoutes.GET("", cartController.GetCart)
-		cartRoutes.POST("/items", cartController.AddToCart)
-		cartRoutes.PUT("/items/:item_id", cartController.UpdateCartItemQuantity)
-		cartRoutes.DELETE("/items/:item_id", cartController.RemoveFromCart)
+		cart.GET("", cartController.GetCart)
+		cart.POST("/items", cartController.AddToCart)
+		cart.PUT("/items/:item_id", cartController.UpdateCartItemQuantity)
+		cart.DELETE("/items/:item_id", cartController.RemoveFromCart)
 	}
 }

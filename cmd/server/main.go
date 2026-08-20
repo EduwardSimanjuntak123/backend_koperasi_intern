@@ -44,6 +44,7 @@ func main() {
 		AllowOrigins: []string{
 			"http://localhost:3000", // React
 			"http://localhost:5173", // Vite
+			"http://localhost:4321", // Astro
 		},
 		AllowMethods: []string{
 			"GET",

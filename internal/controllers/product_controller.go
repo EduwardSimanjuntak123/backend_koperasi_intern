@@ -21,7 +21,8 @@ func NewProductController(service *services.ProductService) *ProductController {
 
 func (c *ProductController) GetAll(ctx *gin.Context) {
 
-	products, err := c.productService.GetAll()
+	search := ctx.Query("search")
+	products, err := c.productService.GetAll(search)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{

@@ -2,10 +2,13 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"strings"
+	"time"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/repositories"
+	"backend_koperasi/internal/utils"
 )
 
 type ProductService struct {
@@ -18,8 +21,8 @@ func NewProductService(repo *repositories.ProductRepository) *ProductService {
 	}
 }
 
-func (s *ProductService) GetAll() ([]models.Product, error) {
-	return s.productRepo.FindAll()
+func (s *ProductService) GetAll(search string) ([]models.Product, error) {
+	return s.productRepo.FindAll(search)
 }
 
 func (s *ProductService) GetByID(id uint) (*models.Product, error) {
@@ -62,11 +65,15 @@ func (s *ProductService) Create(product *models.Product) error {
 	if strings.TrimSpace(product.Name) == "" {
 		return errors.New("product name is required")
 	}
+	// product.Slug = utils.GenerateSlug(product.Name)
+	slug := utils.GenerateSlug(product.Name)
 
-	if strings.TrimSpace(product.Slug) == "" {
-		return errors.New("product slug is required")
+	_, err := s.productRepo.FindBySlug(slug)
+	if err == nil {
+		slug = fmt.Sprintf("%s-%d", slug, time.Now().Unix())
 	}
 
+	product.Slug = slug
 	if product.Price <= 0 {
 		return errors.New("price must be greater than zero")
 	}

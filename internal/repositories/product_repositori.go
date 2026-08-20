@@ -16,21 +16,26 @@ func NewProductRepository(db *gorm.DB) *ProductRepository {
 	}
 }
 
-func (r *ProductRepository) FindAll() ([]models.Product, error) {
+// ini untuk mengambil semua produk dari database, dengan opsi pencarian berdasarkan nama produk.
+// Fungsi ini menggunakan GORM untuk melakukan query ke database dan mengembalikan daftar produk yang ditemukan atau error jika terjadi kesalahan.
+func (r *ProductRepository) FindAll(search string) ([]models.Product, error) {
 
 	var products []models.Product
 
-	err := r.db.
+	query := r.db.
 		Preload("Category").
 		Preload("Brand").
 		Preload("Unit").
-		Preload("Store").
-		Find(&products).Error
+		Preload("Store")
 
+	if search != "" {
+		query = query.Where("LOWER(name) LIKE LOWER(?)", "%"+search+"%")
+	}
+
+	err := query.Find(&products).Error
 	if err != nil {
 		return nil, err
 	}
-
 	return products, nil
 }
 
@@ -65,6 +70,20 @@ func (r *ProductRepository) FindBySlug(slug string) (*models.Product, error) {
 	}
 
 	return &product, nil
+}
+
+func (r *ProductRepository) FindByCategoryID(categoryID uint) ([]models.Product, error) {
+
+	var products []models.Product
+	err := r.db.
+		Where("category_id = ?", categoryID).
+		Preload("Category").
+		Find(&products).Error
+
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 func (r *ProductRepository) Create(product *models.Product) error {

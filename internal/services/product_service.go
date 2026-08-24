@@ -21,8 +21,8 @@ func NewProductService(repo *repositories.ProductRepository) *ProductService {
 	}
 }
 
-func (s *ProductService) GetAll(search string) ([]models.Product, error) {
-	return s.productRepo.FindAll(search)
+func (s *ProductService) GetAll(filter models.ProductFilter) ([]models.Product, int64, error) {
+	return s.productRepo.FindAll(filter)
 }
 
 func (s *ProductService) GetByID(id uint) (*models.Product, error) {

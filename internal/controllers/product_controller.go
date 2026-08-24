@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -20,21 +21,45 @@ func NewProductController(service *services.ProductService) *ProductController {
 }
 
 func (c *ProductController) GetAll(ctx *gin.Context) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
 
-	search := ctx.Query("search")
-	products, err := c.productService.GetAll(search)
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	filter := models.ProductFilter{
+		Search: ctx.Query("search"),
+		Page:   page,
+		Limit:  limit,
+	}
+
+	products, total, err := c.productService.GetAll(filter)
 
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
 			"message": err.Error(),
+			"data":    nil,
 		})
 		return
 	}
 
+	totalPages := int(math.Ceil(float64(total) / float64(limit)))
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
+		"message": "Products retrieved successfully",
 		"data":    products,
+		"meta": gin.H{
+			"page":        page,
+			"limit":       limit,
+			"total":       total,
+			"total_pages": totalPages,
+		},
 	})
 }
 

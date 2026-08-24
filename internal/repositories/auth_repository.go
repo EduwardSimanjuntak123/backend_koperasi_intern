@@ -32,7 +32,13 @@ func (r *AuthRepository) FindByEmail(email string) (*models.User, error) {
 }
 
 func (r *AuthRepository) Create(user *models.User) error {
-	return r.db.Create(user).Error
+	if err := r.db.Create(user).Error; err != nil {
+		return err
+	}
+
+	return r.db.Preload("Role").
+		First(user, user.ID).
+		Error
 }
 
 func (r *AuthRepository) FindByID(id uint) (*models.User, error) {

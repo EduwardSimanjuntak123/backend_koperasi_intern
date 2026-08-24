@@ -16,6 +16,29 @@ const (
 	SlowMoving InventoryMovement = "SLOW_MOVING"
 )
 
+type ProductFilter struct {
+	Search            string
+	BrandID           *uint
+	CategoryID        *uint
+	UnitID            *uint
+	StoreID           *uint
+	MinPrice          *float64
+	MaxPrice          *float64
+	MinStock          *int
+	MaxStock          *int
+	InventoryMovement *InventoryMovement
+	Badge             *ProductBadge
+	StockStatus       string
+	Expired           string
+	CreatedFrom       *time.Time
+	CreatedTo         *time.Time
+
+	Page      int
+	Limit     int
+	SortBy    string
+	SortOrder string
+}
+
 type Product struct {
 	ID uint `gorm:"primaryKey" json:"id"`
 

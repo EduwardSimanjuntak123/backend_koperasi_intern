@@ -60,6 +60,16 @@ func (c *StoreController) GetByID(ctx *gin.Context) {
 
 func (c *StoreController) Create(ctx *gin.Context) {
 
+	// Ambil user_id dari token JWT yang sudah diset oleh AuthMiddleware
+	userID, exists := ctx.Get("user_id")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Unauthorized",
+		})
+		return
+	}
+
 	var store models.Store
 
 	if err := ctx.ShouldBindJSON(&store); err != nil {
@@ -69,7 +79,7 @@ func (c *StoreController) Create(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.storeService.Create(&store); err != nil {
+	if err := c.storeService.Create(&store, userID.(string)); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})

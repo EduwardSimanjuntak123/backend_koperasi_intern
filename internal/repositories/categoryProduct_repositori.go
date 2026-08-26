@@ -39,7 +39,8 @@ func (r *CategoryProductRepository) FindByID(id string) (*models.CategoryProduct
 
 	err := r.db.
 		Preload("Products").
-		First(&category, id).Error
+		Where("id = ?", id).
+		First(&category).Error
 
 	if err != nil {
 		return nil, err
@@ -77,4 +78,8 @@ func (r *CategoryProductRepository) Update(category *models.CategoryProduct) err
 // Menghapus kategori
 func (r *CategoryProductRepository) Delete(id string) error {
 	return r.db.Delete(&models.CategoryProduct{}, id).Error
+}
+
+func (r *CategoryProductRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.CategoryProduct{}, "C")
 }

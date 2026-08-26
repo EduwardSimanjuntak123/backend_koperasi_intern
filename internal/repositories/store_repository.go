@@ -35,7 +35,8 @@ func (r *StoreRepository) FindByID(id string) (*models.Store, error) {
 	var store models.Store
 
 	err := r.db.
-		First(&store, id).Error
+		Where("id = ?", id).
+		First(&store).Error
 
 	if err != nil {
 		return nil, err
@@ -69,4 +70,8 @@ func (r *StoreRepository) Update(store *models.Store) error {
 
 func (r *StoreRepository) Delete(id string) error {
 	return r.db.Delete(&models.Store{}, id).Error
+}
+
+func (r *StoreRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Store{}, "MT")
 }

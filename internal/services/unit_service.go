@@ -46,6 +46,13 @@ func (s *UnitService) Create(unit *models.Unit) error {
 		return errors.New("unit name is required")
 	}
 
+	// Generate ID
+	id, err := s.unitRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	unit.ID = id
+
 	return s.unitRepo.Create(unit)
 }
 

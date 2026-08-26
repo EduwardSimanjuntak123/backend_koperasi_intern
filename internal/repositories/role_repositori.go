@@ -37,7 +37,7 @@ func (r *RoleRepository) FindAll() ([]models.Roles, error) {
 // Get Role By ID
 // ======================================
 
-func (r *RoleRepository) FindByID(id string) (*models.Roles, error) {
+func (r *RoleRepository) FindByID(id uint) (*models.Roles, error) {
 
 	var role models.Roles
 
@@ -108,6 +108,6 @@ func (r *RoleRepository) Update(role *models.Roles) error {
 // Delete Role
 // ======================================
 
-func (r *RoleRepository) Delete(id string) error {
+func (r *RoleRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Roles{}, id).Error
 }

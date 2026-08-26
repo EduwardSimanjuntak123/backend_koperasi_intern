@@ -89,3 +89,11 @@ func (r *CartRepository) UpdateCartItemQuantity(itemID string, quantity int) err
 func (r *CartRepository) DeleteCartItem(itemID string) error {
 	return r.db.Delete(&models.CartItem{}, itemID).Error
 }
+
+func (r *CartRepository) GenerateCartID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Cart{}, "CRT")
+}
+
+func (r *CartRepository) GenerateCartItemID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.CartItem{}, "CI")
+}

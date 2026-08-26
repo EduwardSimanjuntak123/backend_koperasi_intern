@@ -111,3 +111,18 @@ func (r *UserRepository) Update(user *models.User) error {
 func (r *UserRepository) Delete(id string) error {
 	return r.db.Delete(&models.User{}, id).Error
 }
+
+// GenerateNextID menghasilkan ID berikutnya berdasarkan prefix role.
+// roleID 1 = Admin (prefix "A"), roleID 2 = User (prefix "U")
+func (r *UserRepository) GenerateNextID(roleID uint) (string, error) {
+	var prefix string
+	switch roleID {
+	case 1:
+		prefix = "A"
+	case 2:
+		prefix = "U"
+	default:
+		prefix = "U"
+	}
+	return generateNextPrefixedID(r.db, &models.User{}, prefix)
+}

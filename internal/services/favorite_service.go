@@ -39,7 +39,14 @@ func (s *FavoriteService) AddToFavorite(userID string, productID string) error {
 		return errors.New("product is already in favorites")
 	}
 
+	// Generate ID
+	id, err := s.favoriteRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+
 	newFavorite := &models.Favorite{
+		ID:        id,
 		UserID:    userID,
 		ProductID: productID,
 	}

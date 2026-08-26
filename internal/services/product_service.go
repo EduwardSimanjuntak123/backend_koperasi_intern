@@ -106,6 +106,13 @@ func (s *ProductService) Create(product *models.Product) error {
 		}
 	}
 
+	// Generate ID
+	id, err := s.productRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	product.ID = id
+
 	return s.productRepo.Create(product)
 }
 

@@ -2,6 +2,7 @@ package migrations
 
 import (
 	"log"
+	"os"
 
 	"gorm.io/gorm"
 
@@ -9,19 +10,44 @@ import (
 )
 
 func Run(db *gorm.DB) error {
-	err := db.AutoMigrate(
+	if os.Getenv("DROP_ALL_TABLES") == "true" {
+		log.Println("Dropping all tables in public schema...")
 
-		&models.CategoryProduct{},
+		if err := db.Exec(`
+			DO $$
+			DECLARE
+				r RECORD;
+			BEGIN
+				FOR r IN (
+					SELECT tablename
+					FROM pg_tables
+					WHERE schemaname = 'public'
+				) LOOP
+					EXECUTE 'DROP TABLE IF EXISTS "' || r.tablename || '" CASCADE';
+				END LOOP;
+			END $$;
+		`).Error; err != nil {
+			log.Println("Drop tables failed:", err)
+			return err
+		}
+	}
+
+	log.Println("Running AutoMigrate...")
+
+	err := db.AutoMigrate(
+		&models.Roles{},
 		&models.User{},
 		&models.Store{},
-		&models.StoreMember{},
-		&models.Roles{},
+		&models.Brand{},
+		&models.Unit{},
+		&models.CategoryProduct{},
 		&models.Product{},
 		&models.Cart{},
 		&models.CartItem{},
 		&models.Favorite{},
 		&models.PointLocation{},
 		&models.PaymentMethod{},
+		&models.StoreMember{},
 
 		&models.Order{},
 		&models.Order_Item{},

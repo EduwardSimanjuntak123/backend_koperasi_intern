@@ -48,3 +48,7 @@ func (r *FavoriteRepository) DeleteByUserAndProduct(userID string, productID str
 	return r.db.Where("user_id = ? AND product_id = ?", userID, productID).
 		Delete(&models.Favorite{}).Error
 }
+
+func (r *FavoriteRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Favorite{}, "FAV")
+}

@@ -196,7 +196,8 @@ func (r *ProductRepository) FindByID(id string) (*models.Product, error) {
 		Preload("Brand").
 		Preload("Unit").
 		Preload("Store").
-		First(&product, id).Error
+		Where("id = ?", id).
+		First(&product).Error
 
 	if err != nil {
 		return nil, err
@@ -244,4 +245,8 @@ func (r *ProductRepository) Update(product *models.Product) error {
 
 func (r *ProductRepository) Delete(id string) error {
 	return r.db.Delete(&models.Product{}, id).Error
+}
+
+func (r *ProductRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Product{}, "P")
 }

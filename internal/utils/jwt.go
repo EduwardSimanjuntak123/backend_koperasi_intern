@@ -11,12 +11,12 @@ import (
 type Claims struct {
 	UserID string `json:"user_id"`
 	Email  string `json:"email"`
-	RoleID string `json:"role_id"`
+	RoleID uint   `json:"role_id"`
 	jwt.RegisteredClaims
 }
 
 // GenerateToken membuat JWT
-func GenerateToken(userID string, email string, roleID string) (string, error) {
+func GenerateToken(userID string, email string, roleID uint) (string, error) {
 
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {

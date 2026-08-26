@@ -21,6 +21,25 @@ func NewAuthService(authRepo *repositories.AuthRepository) *AuthService {
 		authRepo: authRepo,
 	}
 }
+func (s *AuthService) GenerateUserID(roleID uint) (string, error) {
+	var prefix string
+
+	switch roleID {
+	case 1:
+		prefix = "A" // Admin
+	case 2:
+		prefix = "U" // User
+	default:
+		return "", errors.New("role tidak valid")
+	}
+
+	maxNumber, err := s.authRepo.GetMaxUserNumberByPrefix(prefix)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s-%03d", prefix, maxNumber+1), nil
+}
 
 // =====================================
 // Register
@@ -46,7 +65,7 @@ func (s *AuthService) Register(user *models.User) error {
 	if len(user.Password) < 8 {
 		return errors.New("password minimum 8 karakter")
 	}
-	if strings.TrimSpace(user.RoleID) == "" {
+	if user.RoleID == 0 {
 		return errors.New("role id is required")
 	}
 
@@ -68,6 +87,13 @@ func (s *AuthService) Register(user *models.User) error {
 	}
 
 	user.Password = hash
+	// Generate ID
+	userID, err := s.GenerateUserID(user.RoleID)
+	if err != nil {
+		return err
+	}
+
+	user.ID = userID
 
 	return s.authRepo.Create(user)
 }

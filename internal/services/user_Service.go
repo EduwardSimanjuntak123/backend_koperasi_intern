@@ -67,7 +67,7 @@ func (s *UserService) Create(user *models.User) error {
 	if strings.TrimSpace(user.NoHP) == "" {
 		return errors.New("phone number is required")
 	}
-	if strings.TrimSpace(user.RoleID) == "" {
+	if user.RoleID == 0 {
 		return errors.New("role id is required")
 	}
 
@@ -94,6 +94,13 @@ func (s *UserService) Create(user *models.User) error {
 	}
 
 	user.Password = string(hashedPassword)
+
+	// Generate ID
+	userID, err := s.userRepo.GenerateNextID(user.RoleID)
+	if err != nil {
+		return err
+	}
+	user.ID = userID
 
 	return s.userRepo.Create(user)
 }

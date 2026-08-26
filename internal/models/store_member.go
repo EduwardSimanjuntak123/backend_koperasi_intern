@@ -14,7 +14,7 @@ type StoreMember struct {
 	Store     Store     `gorm:"foreignKey:StoreID" json:"store"`
 	UserID    string    `gorm:"not null" json:"user_id"`
 	User      User      `gorm:"foreignKey:UserID" json:"user"`
-	RoleID    string    `gorm:"not null" json:"role_id"`
+	RoleID    uint      `gorm:"not null" json:"role_id"`
 	Role      Roles     `gorm:"foreignKey:RoleID" json:"role"`
 }
 

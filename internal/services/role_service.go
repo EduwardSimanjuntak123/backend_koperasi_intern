@@ -22,9 +22,9 @@ func (s *RolesService) GetAll() ([]models.Roles, error) {
 	return s.RolesRepo.FindAll()
 }
 
-func (s *RolesService) GetByID(id string) (*models.Roles, error) {
+func (s *RolesService) GetByID(id uint) (*models.Roles, error) {
 
-	if strings.TrimSpace(id) == "" {
+	if id == 0 {
 		return nil, errors.New("invalid Roles id")
 	}
 
@@ -40,7 +40,7 @@ func (s *RolesService) Create(roles *models.Roles) error {
 	return s.RolesRepo.Create(roles)
 }
 
-func (s *RolesService) Update(id string, roles *models.Roles) error {
+func (s *RolesService) Update(id uint, roles *models.Roles) error {
 
 	existing, err := s.RolesRepo.FindByID(id)
 
@@ -53,7 +53,7 @@ func (s *RolesService) Update(id string, roles *models.Roles) error {
 	return s.RolesRepo.Update(existing)
 }
 
-func (s *RolesService) Delete(id string) error {
+func (s *RolesService) Delete(id uint) error {
 
 	_, err := s.RolesRepo.FindByID(id)
 

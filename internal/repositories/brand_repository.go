@@ -37,7 +37,8 @@ func (r *BrandRepository) FindByID(id string) (*models.Brand, error) {
 	var brand models.Brand
 
 	err := r.db.
-		Find(&brand, id).Error
+		Where("id = ?", id).
+		First(&brand).Error
 
 	if err != nil {
 		return nil, err
@@ -75,4 +76,8 @@ func (r *BrandRepository) Update(brand *models.Brand) error {
 // Menghapus brand
 func (r *BrandRepository) Delete(id string) error {
 	return r.db.Delete(&models.Brand{}, id).Error
+}
+
+func (r *BrandRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Brand{}, "br")
 }

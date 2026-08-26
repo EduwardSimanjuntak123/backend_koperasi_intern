@@ -48,9 +48,16 @@ func (s *StoreMemberService) Create(storeMember *models.StoreMember) error {
 		return errors.New("user_id is required")
 	}
 
-	if strings.TrimSpace(storeMember.RoleID) == "" {
+	if storeMember.RoleID == 0 {
 		return errors.New("role_id is required")
 	}
+
+	// Generate ID
+	id, err := s.storeMemberRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	storeMember.ID = id
 
 	return s.storeMemberRepo.Create(storeMember)
 }

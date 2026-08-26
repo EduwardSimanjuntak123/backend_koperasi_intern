@@ -31,7 +31,8 @@ func (s *StoreService) GetByID(id string) (*models.Store, error) {
 	return s.storeRepo.FindByID(id)
 }
 
-func (s *StoreService) Create(store *models.Store) error {
+// Create membuat toko baru. userID diambil dari token JWT (bukan dari body request).
+func (s *StoreService) Create(store *models.Store, userID string) error {
 
 	if strings.TrimSpace(store.NameStore) == "" {
 		return errors.New("store name is required")
@@ -42,6 +43,19 @@ func (s *StoreService) Create(store *models.Store) error {
 	if strings.TrimSpace(store.Logo) == "" {
 		return errors.New("store logo is required")
 	}
+	if strings.TrimSpace(userID) == "" {
+		return errors.New("user tidak terautentikasi")
+	}
+
+	// Ambil user ID dari token, bukan dari body request
+	store.UserID = userID
+
+	// Generate ID
+	id, err := s.storeRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	store.ID = id
 
 	return s.storeRepo.Create(store)
 }

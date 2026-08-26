@@ -26,7 +26,11 @@ func (s *CartService) GetCartByUserID(userID string) (*models.Cart, error) {
 	cart, err := s.cartRepo.FindCartByUserID(userID)
 	if err != nil {
 		// Jika tidak ditemukan, kita buatkan keranjang kosong baru
-		newCart := models.Cart{UserID: userID}
+		cartID, errID := s.cartRepo.GenerateCartID()
+		if errID != nil {
+			return nil, errID
+		}
+		newCart := models.Cart{ID: cartID, UserID: userID}
 		if errCreate := s.cartRepo.CreateCart(&newCart); errCreate != nil {
 			return nil, errors.New("failed to create cart")
 		}
@@ -53,7 +57,12 @@ func (s *CartService) AddToCart(userID string, productID string, quantity int) e
 	}
 
 	// 3. Jika belum ada, buat item baru di keranjang
+	itemID, err := s.cartRepo.GenerateCartItemID()
+	if err != nil {
+		return err
+	}
 	newItem := models.CartItem{
+		ID:        itemID,
 		CartID:    cart.ID,
 		ProductID: productID,
 		Quantity:  quantity,

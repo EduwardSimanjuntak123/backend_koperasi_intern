@@ -36,20 +36,42 @@ func (r *AuthRepository) Create(user *models.User) error {
 		return err
 	}
 
-	return r.db.Preload("Role").
-		First(user, user.ID).
-		Error
+	return r.db.
+		Preload("Role").
+		Where("id = ?", user.ID).
+		First(user).Error
 }
 
 func (r *AuthRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 
-	err := r.db.Preload("Role").First(&user, id).Error
+	err := r.db.
+		Preload("Role").
+		Where("id = ?", id).
+		First(&user).Error
 
 	if err != nil {
 		return nil, err
 	}
 
 	return &user, nil
+}
+
+func (r *AuthRepository) GetMaxUserNumberByPrefix(prefix string) (int, error) {
+	var result struct {
+		MaxNumber int
+	}
+
+	err := r.db.
+		Model(&models.User{}).
+		Select("COALESCE(MAX(CAST(SPLIT_PART(id, '-', 2) AS INTEGER)), 0) AS max_number").
+		Where("id LIKE ?", prefix+"-%").
+		Scan(&result).Error
+
+	if err != nil {
+		return 0, err
+	}
+
+	return result.MaxNumber, nil
 }

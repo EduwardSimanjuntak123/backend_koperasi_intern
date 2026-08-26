@@ -72,3 +72,7 @@ func (r *StoreMemberRepository) Update(storeMember *models.StoreMember) error {
 func (r *StoreMemberRepository) Delete(id string) error {
 	return r.db.Delete(&models.StoreMember{}, id).Error
 }
+
+func (r *StoreMemberRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.StoreMember{}, "SM")
+}

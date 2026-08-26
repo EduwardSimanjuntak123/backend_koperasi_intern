@@ -49,6 +49,13 @@ func (s *BrandService) Create(brand *models.Brand) error {
 		return errors.New("brand slug is required")
 	}
 
+	// Generate ID
+	id, err := s.brandRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	brand.ID = id
+
 	return s.brandRepo.Create(brand)
 }
 

@@ -37,7 +37,8 @@ func (r *UnitRepository) FindByID(id string) (*models.Unit, error) {
 	var unit models.Unit
 
 	err := r.db.
-		Find(&unit, id).Error
+		Where("id = ?", id).
+		First(&unit).Error
 
 	if err != nil {
 		return nil, err
@@ -75,4 +76,8 @@ func (r *UnitRepository) Update(unit *models.Unit) error {
 // Menghapus kategori
 func (r *UnitRepository) Delete(id string) error {
 	return r.db.Delete(&models.Unit{}, id).Error
+}
+
+func (r *UnitRepository) GenerateNextID() (string, error) {
+	return generateNextPrefixedID(r.db, &models.Unit{}, "UN")
 }

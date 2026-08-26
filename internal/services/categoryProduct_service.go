@@ -63,6 +63,13 @@ func (s *CategoryProductService) Create(category *models.CategoryProduct) error 
 		return err
 	}
 
+	// Generate ID
+	id, err := s.categoryProductRepo.GenerateNextID()
+	if err != nil {
+		return err
+	}
+	category.ID = id
+
 	return s.categoryProductRepo.Create(category)
 }
 

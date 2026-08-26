@@ -25,9 +25,9 @@ func (s *ProductService) GetAll(filter models.ProductFilter) ([]models.Product, 
 	return s.productRepo.FindAll(filter)
 }
 
-func (s *ProductService) GetByID(id uint) (*models.Product, error) {
+func (s *ProductService) GetByID(id string) (*models.Product, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid product id")
 	}
 
@@ -109,7 +109,7 @@ func (s *ProductService) Create(product *models.Product) error {
 	return s.productRepo.Create(product)
 }
 
-func (s *ProductService) Update(id uint, product *models.Product) error {
+func (s *ProductService) Update(id string, product *models.Product) error {
 
 	existing, err := s.productRepo.FindByID(id)
 
@@ -127,7 +127,7 @@ func (s *ProductService) Update(id uint, product *models.Product) error {
 	return s.productRepo.Update(existing)
 }
 
-func (s *ProductService) Delete(id uint) error {
+func (s *ProductService) Delete(id string) error {
 
 	_, err := s.productRepo.FindByID(id)
 

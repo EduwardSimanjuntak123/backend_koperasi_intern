@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/repositories"
@@ -17,15 +18,15 @@ func NewFavoriteService(repo *repositories.FavoriteRepository) *FavoriteService 
 	}
 }
 
-func (s *FavoriteService) GetUserFavorites(userID uint) ([]models.Favorite, error) {
-	if userID == 0 {
+func (s *FavoriteService) GetUserFavorites(userID string) ([]models.Favorite, error) {
+	if strings.TrimSpace(userID) == "" {
 		return nil, errors.New("invalid user id")
 	}
 	return s.favoriteRepo.FindByUserID(userID)
 }
 
-func (s *FavoriteService) AddToFavorite(userID uint, productID uint) error {
-	if userID == 0 || productID == 0 {
+func (s *FavoriteService) AddToFavorite(userID string, productID string) error {
+	if strings.TrimSpace(userID) == "" || strings.TrimSpace(productID) == "" {
 		return errors.New("user id and product id are required")
 	}
 
@@ -46,8 +47,8 @@ func (s *FavoriteService) AddToFavorite(userID uint, productID uint) error {
 	return s.favoriteRepo.Create(newFavorite)
 }
 
-func (s *FavoriteService) RemoveFromFavorite(userID uint, productID uint) error {
-	if userID == 0 || productID == 0 {
+func (s *FavoriteService) RemoveFromFavorite(userID string, productID string) error {
+	if strings.TrimSpace(userID) == "" || strings.TrimSpace(productID) == "" {
 		return errors.New("invalid parameters")
 	}
 

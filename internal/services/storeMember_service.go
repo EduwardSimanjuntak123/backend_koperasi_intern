@@ -22,9 +22,9 @@ func (s *StoreMemberService) GetAll() ([]models.StoreMember, error) {
 	return s.storeMemberRepo.FindAll()
 }
 
-func (s *StoreMemberService) GetByID(id uint) (*models.StoreMember, error) {
+func (s *StoreMemberService) GetByID(id string) (*models.StoreMember, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid store member id")
 	}
 
@@ -40,22 +40,22 @@ func (s *StoreMemberService) Create(storeMember *models.StoreMember) error {
 		return errors.New("joined_at is required")
 	}
 
-	if storeMember.StoreID == 0 {
+	if strings.TrimSpace(storeMember.StoreID) == "" {
 		return errors.New("store_id is required")
 	}
 
-	if storeMember.UserID == 0 {
+	if strings.TrimSpace(storeMember.UserID) == "" {
 		return errors.New("user_id is required")
 	}
 
-	if storeMember.RoleID == 0 {
+	if strings.TrimSpace(storeMember.RoleID) == "" {
 		return errors.New("role_id is required")
 	}
 
 	return s.storeMemberRepo.Create(storeMember)
 }
 
-func (s *StoreMemberService) Update(id uint, storeMember *models.StoreMember) error {
+func (s *StoreMemberService) Update(id string, storeMember *models.StoreMember) error {
 
 	existing, err := s.storeMemberRepo.FindByID(id)
 
@@ -72,7 +72,7 @@ func (s *StoreMemberService) Update(id uint, storeMember *models.StoreMember) er
 	return s.storeMemberRepo.Update(existing)
 }
 
-func (s *StoreMemberService) Delete(id uint) error {
+func (s *StoreMemberService) Delete(id string) error {
 
 	_, err := s.storeMemberRepo.FindByID(id)
 

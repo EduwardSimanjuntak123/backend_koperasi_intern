@@ -132,7 +132,7 @@ func (ac *AuthController) Logout(c *gin.Context) {
 // =====================================
 func (ac *AuthController) Me(c *gin.Context) {
 
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(string)
 
 	user, err := ac.authService.Me(userID)
 	if err != nil {

@@ -28,9 +28,9 @@ func (s *UnitService) GetAll() ([]models.Unit, error) {
 // =========================
 // Get Unit By ID
 // =========================
-func (s *UnitService) GetByID(id uint) (*models.Unit, error) {
+func (s *UnitService) GetByID(id string) (*models.Unit, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid unit id")
 	}
 
@@ -52,7 +52,7 @@ func (s *UnitService) Create(unit *models.Unit) error {
 // =========================
 // Update Unit
 // =========================
-func (s *UnitService) Update(id uint, unit *models.Unit) error {
+func (s *UnitService) Update(id string, unit *models.Unit) error {
 
 	existing, err := s.unitRepo.FindByID(id)
 
@@ -72,7 +72,7 @@ func (s *UnitService) Update(id uint, unit *models.Unit) error {
 // =========================
 // Delete Unit
 // =========================
-func (s *UnitService) Delete(id uint) error {
+func (s *UnitService) Delete(id string) error {
 
 	_, err := s.unitRepo.FindByID(id)
 

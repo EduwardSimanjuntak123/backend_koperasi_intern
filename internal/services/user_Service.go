@@ -32,9 +32,9 @@ func (s *UserService) GetAll() ([]models.User, error) {
 // Get User By ID
 // ======================================
 
-func (s *UserService) GetByID(id uint) (*models.User, error) {
+func (s *UserService) GetByID(id string) (*models.User, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid user id")
 	}
 
@@ -67,7 +67,7 @@ func (s *UserService) Create(user *models.User) error {
 	if strings.TrimSpace(user.NoHP) == "" {
 		return errors.New("phone number is required")
 	}
-	if user.RoleID == 0 {
+	if strings.TrimSpace(user.RoleID) == "" {
 		return errors.New("role id is required")
 	}
 
@@ -102,7 +102,7 @@ func (s *UserService) Create(user *models.User) error {
 // Update User
 // ======================================
 
-func (s *UserService) Update(id uint, user *models.User) error {
+func (s *UserService) Update(id string, user *models.User) error {
 
 	existing, err := s.userRepo.FindByID(id)
 
@@ -138,7 +138,7 @@ func (s *UserService) Update(id uint, user *models.User) error {
 // Delete User
 // ======================================
 
-func (s *UserService) Delete(id uint) error {
+func (s *UserService) Delete(id string) error {
 
 	_, err := s.userRepo.FindByID(id)
 

@@ -65,16 +65,15 @@ func (c *ProductController) GetAll(ctx *gin.Context) {
 
 func (c *ProductController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
 		return
 	}
 
-	product, err := c.productService.GetByID(uint(id))
+	product, err := c.productService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -125,9 +124,8 @@ func (c *ProductController) Create(ctx *gin.Context) {
 
 func (c *ProductController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
@@ -143,7 +141,7 @@ func (c *ProductController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.productService.Update(uint(id), &product); err != nil {
+	if err := c.productService.Update(id, &product); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
@@ -158,16 +156,15 @@ func (c *ProductController) Update(ctx *gin.Context) {
 
 func (c *ProductController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
 		return
 	}
 
-	if err := c.productService.Delete(uint(id)); err != nil {
+	if err := c.productService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})

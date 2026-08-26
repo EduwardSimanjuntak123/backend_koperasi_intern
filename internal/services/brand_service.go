@@ -28,9 +28,9 @@ func (s *BrandService) GetAll() ([]models.Brand, error) {
 // =========================
 // Get Brand By ID
 // =========================
-func (s *BrandService) GetByID(id uint) (*models.Brand, error) {
+func (s *BrandService) GetByID(id string) (*models.Brand, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid brand id")
 	}
 
@@ -55,7 +55,7 @@ func (s *BrandService) Create(brand *models.Brand) error {
 // =========================
 // Update Brand
 // =========================
-func (s *BrandService) Update(id uint, brand *models.Brand) error {
+func (s *BrandService) Update(id string, brand *models.Brand) error {
 
 	existing, err := s.brandRepo.FindByID(id)
 
@@ -75,7 +75,7 @@ func (s *BrandService) Update(id uint, brand *models.Brand) error {
 // =========================
 // Delete Brand
 // =========================
-func (s *BrandService) Delete(id uint) error {
+func (s *BrandService) Delete(id string) error {
 
 	_, err := s.brandRepo.FindByID(id)
 

@@ -4,7 +4,6 @@ import (
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -39,16 +38,15 @@ func (c *StoreMemberController) GetAll(ctx *gin.Context) {
 
 func (c *StoreMemberController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
 		return
 	}
 
-	storeMember, err := c.storeMemberService.GetByID(uint(id))
+	storeMember, err := c.storeMemberService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -83,9 +81,8 @@ func (c *StoreMemberController) Create(ctx *gin.Context) {
 
 func (c *StoreMemberController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
@@ -101,7 +98,7 @@ func (c *StoreMemberController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.storeMemberService.Update(uint(id), &storeMember); err != nil {
+	if err := c.storeMemberService.Update(id, &storeMember); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})
@@ -115,16 +112,15 @@ func (c *StoreMemberController) Update(ctx *gin.Context) {
 
 func (c *StoreMemberController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": "invalid id",
 		})
 		return
 	}
 
-	if err := c.storeMemberService.Delete(uint(id)); err != nil {
+	if err := c.storeMemberService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"message": err.Error(),
 		})

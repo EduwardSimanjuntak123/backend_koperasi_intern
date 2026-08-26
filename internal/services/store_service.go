@@ -22,9 +22,9 @@ func (s *StoreService) GetAll() ([]models.Store, error) {
 	return s.storeRepo.FindAll()
 }
 
-func (s *StoreService) GetByID(id uint) (*models.Store, error) {
+func (s *StoreService) GetByID(id string) (*models.Store, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid store id")
 	}
 
@@ -46,7 +46,7 @@ func (s *StoreService) Create(store *models.Store) error {
 	return s.storeRepo.Create(store)
 }
 
-func (s *StoreService) Update(id uint, store *models.Store) error {
+func (s *StoreService) Update(id string, store *models.Store) error {
 
 	existing, err := s.storeRepo.FindByID(id)
 
@@ -62,7 +62,7 @@ func (s *StoreService) Update(id uint, store *models.Store) error {
 	return s.storeRepo.Update(existing)
 }
 
-func (s *StoreService) Delete(id uint) error {
+func (s *StoreService) Delete(id string) error {
 
 	_, err := s.storeRepo.FindByID(id)
 

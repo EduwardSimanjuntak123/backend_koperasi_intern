@@ -18,7 +18,7 @@ func BuyerMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if roleID.(uint) != 2 {
+		if roleID.(string) != "2" {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"success": false,
 				"message": "Only buyers can access this resource",

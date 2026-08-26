@@ -46,7 +46,7 @@ func (s *AuthService) Register(user *models.User) error {
 	if len(user.Password) < 8 {
 		return errors.New("password minimum 8 karakter")
 	}
-	if user.RoleID == 0 {
+	if strings.TrimSpace(user.RoleID) == "" {
 		return errors.New("role id is required")
 	}
 
@@ -118,9 +118,9 @@ func (s *AuthService) Login(email, password string) (string, *models.User, error
 // =====================================
 // Get Profile
 // =====================================
-func (s *AuthService) Me(userID uint) (*models.User, error) {
+func (s *AuthService) Me(userID string) (*models.User, error) {
 
-	if userID == 0 {
+	if strings.TrimSpace(userID) == "" {
 		return nil, errors.New("invalid user id")
 	}
 

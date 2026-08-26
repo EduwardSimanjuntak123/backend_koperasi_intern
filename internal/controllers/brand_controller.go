@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
@@ -47,9 +46,8 @@ func (c *BrandController) GetAll(ctx *gin.Context) {
 // =====================================
 func (c *BrandController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid brand id",
@@ -57,7 +55,7 @@ func (c *BrandController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	brand, err := c.brandService.GetByID(uint(id))
+	brand, err := c.brandService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -109,9 +107,8 @@ func (c *BrandController) Create(ctx *gin.Context) {
 // =====================================
 func (c *BrandController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid brand id",
@@ -129,7 +126,7 @@ func (c *BrandController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.brandService.Update(uint(id), &brand); err != nil {
+	if err := c.brandService.Update(id, &brand); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -148,9 +145,8 @@ func (c *BrandController) Update(ctx *gin.Context) {
 // =====================================
 func (c *BrandController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid brand id",
@@ -158,7 +154,7 @@ func (c *BrandController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.brandService.Delete(uint(id)); err != nil {
+	if err := c.brandService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

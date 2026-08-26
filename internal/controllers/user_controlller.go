@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
@@ -49,9 +48,8 @@ func (c *UserController) GetAll(ctx *gin.Context) {
 
 func (c *UserController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid user id",
@@ -59,7 +57,7 @@ func (c *UserController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	user, err := c.userService.GetByID(uint(id))
+	user, err := c.userService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -113,9 +111,8 @@ func (c *UserController) Create(ctx *gin.Context) {
 
 func (c *UserController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid user id",
@@ -133,7 +130,7 @@ func (c *UserController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.userService.Update(uint(id), &user); err != nil {
+	if err := c.userService.Update(id, &user); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -153,9 +150,8 @@ func (c *UserController) Update(ctx *gin.Context) {
 
 func (c *UserController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid user id",
@@ -163,7 +159,7 @@ func (c *UserController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.userService.Delete(uint(id)); err != nil {
+	if err := c.userService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

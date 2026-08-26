@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"strings"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/repositories"
@@ -18,7 +19,10 @@ func NewCartService(cartRepo *repositories.CartRepository) *CartService {
 }
 
 // Mengambil keranjang user. Jika belum ada, buatkan keranjang baru secara otomatis.
-func (s *CartService) GetCartByUserID(userID uint) (*models.Cart, error) {
+func (s *CartService) GetCartByUserID(userID string) (*models.Cart, error) {
+	if strings.TrimSpace(userID) == "" {
+		return nil, errors.New("invalid user id")
+	}
 	cart, err := s.cartRepo.FindCartByUserID(userID)
 	if err != nil {
 		// Jika tidak ditemukan, kita buatkan keranjang kosong baru
@@ -32,7 +36,7 @@ func (s *CartService) GetCartByUserID(userID uint) (*models.Cart, error) {
 }
 
 // Menambahkan produk ke keranjang
-func (s *CartService) AddToCart(userID uint, productID uint, quantity int) error {
+func (s *CartService) AddToCart(userID string, productID string, quantity int) error {
 	// 1. Pastikan keranjang user tersedia
 	cart, err := s.GetCartByUserID(userID)
 	if err != nil {
@@ -41,7 +45,7 @@ func (s *CartService) AddToCart(userID uint, productID uint, quantity int) error
 
 	// 2. Cek apakah barang sudah ada di keranjang
 	existingItem, err := s.cartRepo.FindCartItem(cart.ID, productID)
-	
+
 	if err == nil && existingItem != nil {
 		// Jika sudah ada, tambahkan kuantitasnya (tidak membuat baris baru)
 		newQuantity := existingItem.Quantity + quantity
@@ -58,7 +62,7 @@ func (s *CartService) AddToCart(userID uint, productID uint, quantity int) error
 }
 
 // Mengubah kuantitas item spesifik
-func (s *CartService) UpdateItemQuantity(userID uint, itemID uint, quantity int) error {
+func (s *CartService) UpdateItemQuantity(userID string, itemID string, quantity int) error {
 	// Verifikasi kepemilikan: Pastikan item ini benar-benar ada di keranjang milik userID tersebut
 	item, err := s.cartRepo.FindCartItemByID(itemID)
 	if err != nil {
@@ -74,7 +78,7 @@ func (s *CartService) UpdateItemQuantity(userID uint, itemID uint, quantity int)
 }
 
 // Menghapus item dari keranjang
-func (s *CartService) RemoveItem(userID uint, itemID uint) error {
+func (s *CartService) RemoveItem(userID string, itemID string) error {
 	// Verifikasi kepemilikan seperti di atas
 	item, err := s.cartRepo.FindCartItemByID(itemID)
 	if err != nil {

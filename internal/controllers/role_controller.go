@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
@@ -47,9 +46,8 @@ func (c *RolesController) GetAll(ctx *gin.Context) {
 // =====================================
 func (c *RolesController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid role id",
@@ -57,7 +55,7 @@ func (c *RolesController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	role, err := c.rolesService.GetByID(uint(id))
+	role, err := c.rolesService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -109,9 +107,8 @@ func (c *RolesController) Create(ctx *gin.Context) {
 // =====================================
 func (c *RolesController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid role id",
@@ -129,7 +126,7 @@ func (c *RolesController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.rolesService.Update(uint(id), &role); err != nil {
+	if err := c.rolesService.Update(id, &role); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -148,9 +145,8 @@ func (c *RolesController) Update(ctx *gin.Context) {
 // =====================================
 func (c *RolesController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid role id",
@@ -158,7 +154,7 @@ func (c *RolesController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.rolesService.Delete(uint(id)); err != nil {
+	if err := c.rolesService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

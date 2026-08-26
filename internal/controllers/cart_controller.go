@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/services"
 
@@ -25,7 +24,7 @@ func NewCartController(cartService *services.CartService) *CartController {
 // =====================================
 func (cc *CartController) GetCart(c *gin.Context) {
 	// Mengambil user_id dari JWT via AuthMiddleware
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(string)
 
 	cart, err := cc.cartService.GetCartByUserID(userID)
 	if err != nil {
@@ -48,12 +47,12 @@ func (cc *CartController) GetCart(c *gin.Context) {
 // Menambahkan produk ke keranjang
 // =====================================
 func (cc *CartController) AddToCart(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(string)
 
 	// Mendefinisikan struktur request body
 	var req struct {
-		ProductID uint `json:"product_id" binding:"required"`
-		Quantity  int  `json:"quantity" binding:"required,min=1"`
+		ProductID string `json:"product_id" binding:"required"`
+		Quantity  int    `json:"quantity" binding:"required,min=1"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,11 +83,9 @@ func (cc *CartController) AddToCart(c *gin.Context) {
 // Mengubah jumlah (quantity) barang di keranjang
 // =====================================
 func (cc *CartController) UpdateCartItemQuantity(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(string)
 	itemIDStr := c.Param("item_id")
-	itemID, err := strconv.Atoi(itemIDStr)
-
-	if err != nil {
+	if itemIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid cart item ID",
@@ -108,7 +105,7 @@ func (cc *CartController) UpdateCartItemQuantity(c *gin.Context) {
 		return
 	}
 
-	err = cc.cartService.UpdateItemQuantity(userID, uint(itemID), req.Quantity)
+	err := cc.cartService.UpdateItemQuantity(userID, itemIDStr, req.Quantity)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -128,11 +125,9 @@ func (cc *CartController) UpdateCartItemQuantity(c *gin.Context) {
 // Menghapus satu jenis barang dari keranjang
 // =====================================
 func (cc *CartController) RemoveFromCart(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint)
+	userID := c.MustGet("user_id").(string)
 	itemIDStr := c.Param("item_id")
-	itemID, err := strconv.Atoi(itemIDStr)
-
-	if err != nil {
+	if itemIDStr == "" {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid cart item ID",
@@ -140,7 +135,7 @@ func (cc *CartController) RemoveFromCart(c *gin.Context) {
 		return
 	}
 
-	err = cc.cartService.RemoveItem(userID, uint(itemID))
+	err := cc.cartService.RemoveItem(userID, itemIDStr)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,

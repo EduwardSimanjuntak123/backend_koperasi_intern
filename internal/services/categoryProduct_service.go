@@ -30,9 +30,9 @@ func (s *CategoryProductService) GetAll() ([]models.CategoryProduct, error) {
 // =========================
 // Get Category By ID
 // =========================
-func (s *CategoryProductService) GetByID(id uint) (*models.CategoryProduct, error) {
+func (s *CategoryProductService) GetByID(id string) (*models.CategoryProduct, error) {
 
-	if id == 0 {
+	if strings.TrimSpace(id) == "" {
 		return nil, errors.New("invalid category id")
 	}
 
@@ -69,7 +69,7 @@ func (s *CategoryProductService) Create(category *models.CategoryProduct) error 
 // =========================
 // Update Category
 // =========================
-func (s *CategoryProductService) Update(id uint, category *models.CategoryProduct) error {
+func (s *CategoryProductService) Update(id string, category *models.CategoryProduct) error {
 
 	existing, err := s.categoryProductRepo.FindByID(id)
 
@@ -108,7 +108,7 @@ func (s *CategoryProductService) Update(id uint, category *models.CategoryProduc
 // =========================
 // Delete Category
 // =========================
-func (s *CategoryProductService) Delete(id uint) error {
+func (s *CategoryProductService) Delete(id string) error {
 
 	_, err := s.categoryProductRepo.FindByID(id)
 

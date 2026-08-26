@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/services"
 
@@ -22,9 +21,7 @@ func NewFavoriteController(service *services.FavoriteService) *FavoriteControlle
 // GET /api/v1/favorites/user/:user_id
 func (c *FavoriteController) GetUserFavorites(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
-	userID, err := strconv.Atoi(userIDStr)
-
-	if err != nil {
+	if userIDStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid user id parameter",
@@ -32,7 +29,7 @@ func (c *FavoriteController) GetUserFavorites(ctx *gin.Context) {
 		return
 	}
 
-	favorites, err := c.favoriteService.GetUserFavorites(uint(userID))
+	favorites, err := c.favoriteService.GetUserFavorites(userIDStr)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -51,8 +48,8 @@ func (c *FavoriteController) GetUserFavorites(ctx *gin.Context) {
 // POST /api/v1/favorites
 func (c *FavoriteController) AddToFavorite(ctx *gin.Context) {
 	var req struct {
-		UserID    uint `json:"user_id" binding:"required"`
-		ProductID uint `json:"product_id" binding:"required"`
+		UserID    string `json:"user_id" binding:"required"`
+		ProductID string `json:"product_id" binding:"required"`
 	}
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -82,10 +79,7 @@ func (c *FavoriteController) RemoveFromFavorite(ctx *gin.Context) {
 	userIDStr := ctx.Param("user_id")
 	productIDStr := ctx.Param("product_id")
 
-	userID, err1 := strconv.Atoi(userIDStr)
-	productID, err2 := strconv.Atoi(productIDStr)
-
-	if err1 != nil || err2 != nil {
+	if userIDStr == "" || productIDStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid user id or product id parameter",
@@ -93,7 +87,7 @@ func (c *FavoriteController) RemoveFromFavorite(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.favoriteService.RemoveFromFavorite(uint(userID), uint(productID)); err != nil {
+	if err := c.favoriteService.RemoveFromFavorite(userIDStr, productIDStr); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

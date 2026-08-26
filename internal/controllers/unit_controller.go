@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"net/http"
-	"strconv"
 
 	"backend_koperasi/internal/models"
 	"backend_koperasi/internal/services"
@@ -47,9 +46,8 @@ func (c *UnitController) GetAll(ctx *gin.Context) {
 // =====================================
 func (c *UnitController) GetByID(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid unit id",
@@ -57,7 +55,7 @@ func (c *UnitController) GetByID(ctx *gin.Context) {
 		return
 	}
 
-	unit, err := c.unitService.GetByID(uint(id))
+	unit, err := c.unitService.GetByID(id)
 
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -109,9 +107,8 @@ func (c *UnitController) Create(ctx *gin.Context) {
 // =====================================
 func (c *UnitController) Update(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid unit id",
@@ -129,7 +126,7 @@ func (c *UnitController) Update(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.unitService.Update(uint(id), &unit); err != nil {
+	if err := c.unitService.Update(id, &unit); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -148,9 +145,8 @@ func (c *UnitController) Update(ctx *gin.Context) {
 // =====================================
 func (c *UnitController) Delete(ctx *gin.Context) {
 
-	id, err := strconv.Atoi(ctx.Param("id"))
-
-	if err != nil {
+	id := ctx.Param("id")
+	if id == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": "Invalid unit id",
@@ -158,7 +154,7 @@ func (c *UnitController) Delete(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.unitService.Delete(uint(id)); err != nil {
+	if err := c.unitService.Delete(id); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

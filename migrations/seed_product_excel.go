@@ -158,22 +158,22 @@ func SeedProductsFromExcel(db *gorm.DB, filePath string) error {
 		// Relation
 		// =========================
 
-		category := parseUint(col(5))
-		if category != 0 {
+		category := strings.TrimSpace(col(5))
+		if category != "" {
 			product.CategoryID = &category
 		}
 
-		brand := parseUint(col(8))
-		if brand != 0 {
+		brand := strings.TrimSpace(col(8))
+		if brand != "" {
 			product.BrandID = &brand
 		}
 
-		unit := parseUint(col(9))
-		if unit != 0 {
+		unit := strings.TrimSpace(col(9))
+		if unit != "" {
 			product.UnitID = &unit
 		}
 
-		product.StoreID = parseUint(col(7))
+		product.StoreID = strings.TrimSpace(col(7))
 
 		// =========================
 		// Inventory

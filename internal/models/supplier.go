@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Supplier struct {
-	ID   uint   `gorm:"primaryKey" json:"id"`
+	ID   string `gorm:"primaryKey" json:"id"`
 	Code string `gorm:"size:50;uniqueIndex" json:"code"`
 	Name string `gorm:"size:150;not null" json:"name"`
 

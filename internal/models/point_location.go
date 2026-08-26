@@ -1,8 +1,8 @@
 package models
 
 type PointLocation struct {
-	ID            uint   `gorm:"primaryKey" json:"id"`
-	StoreID       uint   `gorm:"not null" json:"store_id"`
+	ID            string `gorm:"primaryKey" json:"id"`
+	StoreID       string `gorm:"not null" json:"store_id"`
 	Store         Store  `gorm:"foreignKey:StoreID" json:"store"`
 	Name_Location string `gorm:"not null" json:"name"`
 	Address       string `gorm:"not null" json:"address"`

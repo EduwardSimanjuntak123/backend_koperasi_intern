@@ -18,10 +18,10 @@ const (
 
 type ProductFilter struct {
 	Search            string
-	BrandID           *uint
-	CategoryID        *uint
-	UnitID            *uint
-	StoreID           *uint
+	BrandID           *string
+	CategoryID        *string
+	UnitID            *string
+	StoreID           *string
 	MinPrice          *float64
 	MaxPrice          *float64
 	MinStock          *int
@@ -40,7 +40,7 @@ type ProductFilter struct {
 }
 
 type Product struct {
-	ID uint `gorm:"primaryKey" json:"id"`
+	ID string `gorm:"primaryKey" json:"id"`
 
 	// Basic
 	Name    string  `gorm:"not null" json:"name"`
@@ -69,16 +69,16 @@ type Product struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// Relation
-	BrandID *uint  `json:"brand_id"`
+	BrandID *string  `json:"brand_id"`
 	Brand   *Brand `gorm:"foreignKey:BrandID" json:"brand"`
 
-	UnitID     *uint            `json:"unit_id"`
+	UnitID     *string          `json:"unit_id"`
 	Unit       *Unit            `gorm:"foreignKey:UnitID" json:"unit"`
-	CategoryID *uint            `json:"category_id"`
+	CategoryID *string          `json:"category_id"`
 	Category   *CategoryProduct `gorm:"foreignKey:CategoryID" json:"category"`
 
 	Favorites []Product `gorm:"many2many:user_favorites;"`
 
-	StoreID uint  `gorm:"not null" json:"store_id"`
+	StoreID string `gorm:"not null" json:"store_id"`
 	Store   Store `gorm:"foreignKey:StoreID" json:"store"`
 }

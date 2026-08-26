@@ -3,7 +3,7 @@ package models
 import "time"
 
 type User struct {
-	ID        uint      `gorm:"primaryKey" json:"id"`
+	ID        string    `gorm:"primaryKey" json:"id"`
 	Name      string    `gorm:"not null" json:"name"`
 	Username  string    `gorm:"uniqueIndex;not null" json:"username"`
 	Email     string    `gorm:"uniqueIndex;not null" json:"email"`
@@ -11,7 +11,7 @@ type User struct {
 	NoHP      string    `gorm:"uniqueIndex;not null" json:"no_hp"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
-	RoleID    uint      `gorm:"not null" json:"role_id"`
+	RoleID    string    `gorm:"not null" json:"role_id"`
 	Role      Roles     `gorm:"foreignKey:RoleID" json:"role"`
 	Stores    []Store   `gorm:"foreignKey:UserID" json:"stores,omitempty"`
 	Favorites []Product `gorm:"many2many:user_favorites;" json:"favorites"`

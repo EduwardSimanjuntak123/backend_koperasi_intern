@@ -33,7 +33,7 @@ func (r *CategoryProductRepository) FindAll() ([]models.CategoryProduct, error) 
 }
 
 // Mengambil kategori berdasarkan ID
-func (r *CategoryProductRepository) FindByID(id uint) (*models.CategoryProduct, error) {
+func (r *CategoryProductRepository) FindByID(id string) (*models.CategoryProduct, error) {
 
 	var category models.CategoryProduct
 
@@ -75,6 +75,6 @@ func (r *CategoryProductRepository) Update(category *models.CategoryProduct) err
 }
 
 // Menghapus kategori
-func (r *CategoryProductRepository) Delete(id uint) error {
+func (r *CategoryProductRepository) Delete(id string) error {
 	return r.db.Delete(&models.CategoryProduct{}, id).Error
 }

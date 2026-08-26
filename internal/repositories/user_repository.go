@@ -37,7 +37,7 @@ func (r *UserRepository) FindAll() ([]models.User, error) {
 // Get User By ID
 // ======================================
 
-func (r *UserRepository) FindByID(id uint) (*models.User, error) {
+func (r *UserRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 
@@ -108,6 +108,6 @@ func (r *UserRepository) Update(user *models.User) error {
 // Delete User
 // ======================================
 
-func (r *UserRepository) Delete(id uint) error {
+func (r *UserRepository) Delete(id string) error {
 	return r.db.Delete(&models.User{}, id).Error
 }

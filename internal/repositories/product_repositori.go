@@ -187,7 +187,7 @@ func (r *ProductRepository) FindAll(
 	return products, total, nil
 }
 
-func (r *ProductRepository) FindByID(id uint) (*models.Product, error) {
+func (r *ProductRepository) FindByID(id string) (*models.Product, error) {
 
 	var product models.Product
 
@@ -220,7 +220,7 @@ func (r *ProductRepository) FindBySlug(slug string) (*models.Product, error) {
 	return &product, nil
 }
 
-func (r *ProductRepository) FindByCategoryID(categoryID uint) ([]models.Product, error) {
+func (r *ProductRepository) FindByCategoryID(categoryID string) ([]models.Product, error) {
 
 	var products []models.Product
 	err := r.db.
@@ -242,6 +242,6 @@ func (r *ProductRepository) Update(product *models.Product) error {
 	return r.db.Save(product).Error
 }
 
-func (r *ProductRepository) Delete(id uint) error {
+func (r *ProductRepository) Delete(id string) error {
 	return r.db.Delete(&models.Product{}, id).Error
 }

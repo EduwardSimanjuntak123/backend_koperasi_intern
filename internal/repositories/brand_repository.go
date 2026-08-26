@@ -32,7 +32,7 @@ func (r *BrandRepository) FindAll() ([]models.Brand, error) {
 }
 
 // Mengambil brand berdasarkan ID
-func (r *BrandRepository) FindByID(id uint) (*models.Brand, error) {
+func (r *BrandRepository) FindByID(id string) (*models.Brand, error) {
 
 	var brand models.Brand
 
@@ -73,6 +73,6 @@ func (r *BrandRepository) Update(brand *models.Brand) error {
 }
 
 // Menghapus brand
-func (r *BrandRepository) Delete(id uint) error {
+func (r *BrandRepository) Delete(id string) error {
 	return r.db.Delete(&models.Brand{}, id).Error
 }

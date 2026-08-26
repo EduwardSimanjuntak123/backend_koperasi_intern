@@ -31,7 +31,7 @@ func (r *StoreMemberRepository) FindAll() ([]models.StoreMember, error) {
 	return storeMembers, nil
 }
 
-func (r *StoreMemberRepository) FindByID(id uint) (*models.StoreMember, error) {
+func (r *StoreMemberRepository) FindByID(id string) (*models.StoreMember, error) {
 
 	var storeMember models.StoreMember
 
@@ -69,6 +69,6 @@ func (r *StoreMemberRepository) Update(storeMember *models.StoreMember) error {
 	return r.db.Save(storeMember).Error
 }
 
-func (r *StoreMemberRepository) Delete(id uint) error {
+func (r *StoreMemberRepository) Delete(id string) error {
 	return r.db.Delete(&models.StoreMember{}, id).Error
 }

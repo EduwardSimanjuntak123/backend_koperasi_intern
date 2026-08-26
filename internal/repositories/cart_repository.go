@@ -23,10 +23,10 @@ func NewCartRepository(db *gorm.DB) *CartRepository {
 // =====================================
 
 // Mencari keranjang berdasarkan UserID beserta seluruh isinya
-func (r *CartRepository) FindCartByUserID(userID uint) (*models.Cart, error) {
+func (r *CartRepository) FindCartByUserID(userID string) (*models.Cart, error) {
 	var cart models.Cart
 
-	// Preload "CartItems" dan relasi bersarang "CartItems.Product" 
+	// Preload "CartItems" dan relasi bersarang "CartItems.Product"
 	// agar saat data keranjang ditarik, detail produknya ikut terbawa secara otomatis.
 	err := r.db.Preload("CartItems").Preload("CartItems.Product").Where("user_id = ?", userID).First(&cart).Error
 	if err != nil {
@@ -49,7 +49,7 @@ func (r *CartRepository) CreateCart(cart *models.Cart) error {
 // =====================================
 
 // Mencari spesifik satu item di dalam keranjang (untuk mengecek apakah barang sudah ada)
-func (r *CartRepository) FindCartItem(cartID uint, productID uint) (*models.CartItem, error) {
+func (r *CartRepository) FindCartItem(cartID string, productID string) (*models.CartItem, error) {
 	var item models.CartItem
 
 	err := r.db.Where("cart_id = ? AND product_id = ?", cartID, productID).First(&item).Error
@@ -64,7 +64,7 @@ func (r *CartRepository) FindCartItem(cartID uint, productID uint) (*models.Cart
 }
 
 // Mencari item keranjang berdasarkan ID item-nya sendiri (untuk proses Update/Delete)
-func (r *CartRepository) FindCartItemByID(itemID uint) (*models.CartItem, error) {
+func (r *CartRepository) FindCartItemByID(itemID string) (*models.CartItem, error) {
 	var item models.CartItem
 
 	err := r.db.First(&item, itemID).Error
@@ -81,11 +81,11 @@ func (r *CartRepository) CreateCartItem(item *models.CartItem) error {
 }
 
 // Mengubah jumlah (quantity) item yang sudah ada di keranjang
-func (r *CartRepository) UpdateCartItemQuantity(itemID uint, quantity int) error {
+func (r *CartRepository) UpdateCartItemQuantity(itemID string, quantity int) error {
 	return r.db.Model(&models.CartItem{}).Where("id = ?", itemID).Update("quantity", quantity).Error
 }
 
 // Menghapus item dari keranjang
-func (r *CartRepository) DeleteCartItem(itemID uint) error {
+func (r *CartRepository) DeleteCartItem(itemID string) error {
 	return r.db.Delete(&models.CartItem{}, itemID).Error
 }

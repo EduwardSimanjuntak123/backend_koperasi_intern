@@ -32,7 +32,7 @@ func (r *UnitRepository) FindAll() ([]models.Unit, error) {
 }
 
 // Mengambil kategori berdasarkan ID
-func (r *UnitRepository) FindByID(id uint) (*models.Unit, error) {
+func (r *UnitRepository) FindByID(id string) (*models.Unit, error) {
 
 	var unit models.Unit
 
@@ -73,6 +73,6 @@ func (r *UnitRepository) Update(unit *models.Unit) error {
 }
 
 // Menghapus kategori
-func (r *UnitRepository) Delete(id uint) error {
+func (r *UnitRepository) Delete(id string) error {
 	return r.db.Delete(&models.Unit{}, id).Error
 }

@@ -17,7 +17,7 @@ func NewFavoriteRepository(db *gorm.DB) *FavoriteRepository {
 }
 
 // Mengambil semua data favorit milik satu user, beserta detail produknya
-func (r *FavoriteRepository) FindByUserID(userID uint) ([]models.Favorite, error) {
+func (r *FavoriteRepository) FindByUserID(userID string) ([]models.Favorite, error) {
 	var favorites []models.Favorite
 
 	err := r.db.Preload("Product").Where("user_id = ?", userID).Find(&favorites).Error
@@ -29,7 +29,7 @@ func (r *FavoriteRepository) FindByUserID(userID uint) ([]models.Favorite, error
 }
 
 // Mengecek apakah produk sudah ada di favorit user
-func (r *FavoriteRepository) CheckIfExists(userID uint, productID uint) (bool, error) {
+func (r *FavoriteRepository) CheckIfExists(userID string, productID string) (bool, error) {
 	var count int64
 	err := r.db.Model(&models.Favorite{}).
 		Where("user_id = ? AND product_id = ?", userID, productID).
@@ -44,7 +44,7 @@ func (r *FavoriteRepository) Create(favorite *models.Favorite) error {
 }
 
 // Menghapus data favorit berdasarkan user_id dan product_id
-func (r *FavoriteRepository) DeleteByUserAndProduct(userID uint, productID uint) error {
+func (r *FavoriteRepository) DeleteByUserAndProduct(userID string, productID string) error {
 	return r.db.Where("user_id = ? AND product_id = ?", userID, productID).
 		Delete(&models.Favorite{}).Error
 }

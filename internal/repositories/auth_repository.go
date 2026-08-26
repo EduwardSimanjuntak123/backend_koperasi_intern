@@ -41,7 +41,7 @@ func (r *AuthRepository) Create(user *models.User) error {
 		Error
 }
 
-func (r *AuthRepository) FindByID(id uint) (*models.User, error) {
+func (r *AuthRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 

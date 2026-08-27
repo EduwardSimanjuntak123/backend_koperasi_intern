@@ -244,7 +244,15 @@ func (r *ProductRepository) Update(product *models.Product) error {
 }
 
 func (r *ProductRepository) Delete(id string) error {
-	return r.db.Delete(&models.Product{}, id).Error
+
+	result := r.db.Where("id = ?", id).Delete(&models.Product{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *ProductRepository) GenerateNextID() (string, error) {

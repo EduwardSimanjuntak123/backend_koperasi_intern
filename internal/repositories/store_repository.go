@@ -68,8 +68,16 @@ func (r *StoreRepository) Update(store *models.Store) error {
 	return r.db.Save(store).Error
 }
 
+// Menghapus kategori
 func (r *StoreRepository) Delete(id string) error {
-	return r.db.Delete(&models.Store{}, id).Error
+	result := r.db.Where("id = ?", id).Delete(&models.Store{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *StoreRepository) GenerateNextID() (string, error) {

@@ -77,7 +77,14 @@ func (r *CategoryProductRepository) Update(category *models.CategoryProduct) err
 
 // Menghapus kategori
 func (r *CategoryProductRepository) Delete(id string) error {
-	return r.db.Delete(&models.CategoryProduct{}, id).Error
+	result := r.db.Where("id = ?", id).Delete(&models.CategoryProduct{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *CategoryProductRepository) GenerateNextID() (string, error) {

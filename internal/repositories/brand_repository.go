@@ -73,9 +73,15 @@ func (r *BrandRepository) Update(brand *models.Brand) error {
 	return r.db.Save(brand).Error
 }
 
-// Menghapus brand
 func (r *BrandRepository) Delete(id string) error {
-	return r.db.Delete(&models.Brand{}, id).Error
+	result := r.db.Where("id = ?", id).Delete(&models.Brand{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *BrandRepository) GenerateNextID() (string, error) {

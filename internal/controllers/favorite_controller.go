@@ -18,18 +18,19 @@ func NewFavoriteController(service *services.FavoriteService) *FavoriteControlle
 	}
 }
 
-// GET /api/v1/favorites/user/:user_id
+// GET /api/v1/favorites
 func (c *FavoriteController) GetUserFavorites(ctx *gin.Context) {
-	userIDStr := ctx.Param("user_id")
-	if userIDStr == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
+
+	userID := ctx.GetString("user_id")
+	if userID == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
-			"message": "Invalid user id parameter",
+			"message": "Unauthorized",
 		})
 		return
 	}
 
-	favorites, err := c.favoriteService.GetUserFavorites(userIDStr)
+	favorites, err := c.favoriteService.GetUserFavorites(userID)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -48,7 +49,6 @@ func (c *FavoriteController) GetUserFavorites(ctx *gin.Context) {
 // POST /api/v1/favorites
 func (c *FavoriteController) AddToFavorite(ctx *gin.Context) {
 	var req struct {
-		UserID    string `json:"user_id" binding:"required"`
 		ProductID string `json:"product_id" binding:"required"`
 	}
 
@@ -60,7 +60,16 @@ func (c *FavoriteController) AddToFavorite(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.favoriteService.AddToFavorite(req.UserID, req.ProductID); err != nil {
+	userID := ctx.GetString("user_id")
+	if userID == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	if err := c.favoriteService.AddToFavorite(userID, req.ProductID); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),

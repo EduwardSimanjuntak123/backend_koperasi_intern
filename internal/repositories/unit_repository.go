@@ -75,7 +75,14 @@ func (r *UnitRepository) Update(unit *models.Unit) error {
 
 // Menghapus kategori
 func (r *UnitRepository) Delete(id string) error {
-	return r.db.Delete(&models.Unit{}, id).Error
+	result := r.db.Where("id = ?", id).Delete(&models.Unit{})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (r *UnitRepository) GenerateNextID() (string, error) {

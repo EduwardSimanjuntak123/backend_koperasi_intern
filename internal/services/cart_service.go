@@ -41,6 +41,18 @@ func (s *CartService) GetCartByUserID(userID string) (*models.Cart, error) {
 
 // Menambahkan produk ke keranjang
 func (s *CartService) AddToCart(userID string, productID string, quantity int) error {
+
+	if strings.TrimSpace(userID) == "" {
+		return errors.New("invalid user id")
+	}
+
+	if strings.TrimSpace(productID) == "" {
+		return errors.New("invalid product id")
+	}
+
+	if quantity <= 0 {
+		return errors.New("quantity must be greater than 0")
+	}
 	// 1. Pastikan keranjang user tersedia
 	cart, err := s.GetCartByUserID(userID)
 	if err != nil {

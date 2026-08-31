@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"backend_koperasi/internal/models"
+	"fmt"
 
 	"gorm.io/gorm"
 )
@@ -44,11 +45,17 @@ func (r *FavoriteRepository) Create(favorite *models.Favorite) error {
 }
 
 // Menghapus data favorit berdasarkan user_id dan product_id
-func (r *FavoriteRepository) DeleteByUserAndProduct(userID string, productID string) error {
-	return r.db.Where("user_id = ? AND product_id = ?", userID, productID).
-		Delete(&models.Favorite{}).Error
-}
+func (r *FavoriteRepository) DeleteByUserAndProduct(userID string, favoriteID string) error {
+	fmt.Println("userID:", userID)
+	fmt.Println("favoriteID:", favoriteID)
+	result := r.db.
+		Where("user_id = ? AND id = ?", userID, favoriteID).
+		Delete(&models.Favorite{})
 
+	fmt.Println("RowsAffected:", result.RowsAffected)
+
+	return result.Error
+}
 func (r *FavoriteRepository) GenerateNextID() (string, error) {
 	return generateNextPrefixedID(r.db, &models.Favorite{}, "FAV")
 }

@@ -84,11 +84,13 @@ func main() {
 	userRepo := repositories.NewUserRepository(db)
 	rolesRepo := repositories.NewRoleRepository(db)
 	storeRepo := repositories.NewStoreRepository(db)
-	storeMemberRepo := repositories.NewStoreMemberRepository(db)
 	favoriteRepo := repositories.NewFavoriteRepository(db)
 	cartRepo := repositories.NewCartRepository(db)
 	brandRepo := repositories.NewBrandRepository(db)
 	unitRepo := repositories.NewUnitRepository(db)
+	buildingRepo := repositories.NewBuildingRepository(db)
+	// courierRepo := repositories.NewCourierRepository(db)
+	floorRepo := repositories.NewFloorRepository(db)
 
 	// ==============================
 	// Service
@@ -99,12 +101,13 @@ func main() {
 	userService := services.NewUserService(userRepo)
 	rolesService := services.NewRolesService(rolesRepo)
 	storeService := services.NewStoreService(storeRepo)
-	storeMemberService := services.NewStoreMemberService(storeMemberRepo)
 	favoriteService := services.NewFavoriteService(favoriteRepo)
 	cartService := services.NewCartService(cartRepo)
 	brandService := services.NewBrandService(brandRepo)
 	unitService := services.NewUnitService(unitRepo)
-
+	buildingService := services.NewBuildingService(buildingRepo)
+	// courierService := services.NewCourierService(courierRepo)
+	floorService := services.NewFloorService(floorRepo)
 	// ==============================
 	// Controller
 	// ==============================
@@ -114,11 +117,13 @@ func main() {
 	userController := controllers.NewUserController(userService)
 	rolesController := controllers.NewRolesController(rolesService)
 	storeController := controllers.NewStoreController(storeService)
-	storeMemberController := controllers.NewStoreMemberController(storeMemberService)
 	favoriteController := controllers.NewFavoriteController(favoriteService)
+	// courierController := controllers.NewCourierController(courierService)
 	cartController := controllers.NewCartController(cartService)
 	brandController := controllers.NewBrandController(brandService)
 	unitController := controllers.NewUnitController(unitService)
+	buildingController := controllers.NewBuildingController(buildingService)
+	floorController := controllers.NewFloorController(floorService)
 
 	// ==============================
 	// Routes
@@ -131,12 +136,14 @@ func main() {
 		userController,
 		rolesController,
 		storeController,
-		storeMemberController,
 		favoriteController,
 		authController,
 		cartController,
 		unitController,
 		brandController,
+		floorController,
+		buildingController,
+		// courierController,
 	)
 	// if err := migrations.SeedProductsFromExcel(db, "assets/products.xlsx"); err != nil {
 	// 	log.Fatal(err)

@@ -13,7 +13,7 @@ func BuyerMiddleware() gin.HandlerFunc {
 		if !exists {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": "Unauthorized",
+				"message": "Tidak terautentikasi: informasi peran pengguna tidak ditemukan",
 			})
 			return
 		}
@@ -21,7 +21,7 @@ func BuyerMiddleware() gin.HandlerFunc {
 		if roleID.(uint) != 2 {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"success": false,
-				"message": "Only buyers can access this resource",
+				"message": "Akses ditolak: hanya pembeli (buyer) yang dapat mengakses fitur ini",
 			})
 			return
 		}

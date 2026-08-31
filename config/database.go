@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
 func ConnectDatabase() (*gorm.DB, error) {
@@ -24,7 +25,9 @@ func ConnectDatabase() (*gorm.DB, error) {
 
 	db, err := gorm.Open(
 		postgres.Open(databaseURL),
-		&gorm.Config{},
+		&gorm.Config{
+			Logger: logger.Default.LogMode(logger.Error),
+		},
 	)
 
 	if err != nil {

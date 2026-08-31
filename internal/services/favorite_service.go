@@ -54,10 +54,10 @@ func (s *FavoriteService) AddToFavorite(userID string, productID string) error {
 	return s.favoriteRepo.Create(newFavorite)
 }
 
-func (s *FavoriteService) RemoveFromFavorite(userID string, productID string) error {
-	if strings.TrimSpace(userID) == "" || strings.TrimSpace(productID) == "" {
+func (s *FavoriteService) RemoveFromFavorite(userID string, favoriteID string) error {
+	if strings.TrimSpace(userID) == "" || strings.TrimSpace(favoriteID) == "" {
 		return errors.New("invalid parameters")
 	}
 
-	return s.favoriteRepo.DeleteByUserAndProduct(userID, productID)
+	return s.favoriteRepo.DeleteByUserAndProduct(userID, favoriteID)
 }

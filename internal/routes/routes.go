@@ -13,12 +13,15 @@ func RegisterRoutes(
 	userController *controllers.UserController,
 	rolesController *controllers.RolesController,
 	storeController *controllers.StoreController,
-	storeMemberController *controllers.StoreMemberController,
 	favoriteController *controllers.FavoriteController,
 	authController *controllers.AuthController,
 	cartController *controllers.CartController,
 	unitController *controllers.UnitController,
 	brandController *controllers.BrandController,
+	floorController *controllers.FloorController,
+	buildingController *controllers.BuildingController,
+	// courierController *controllers.CourierController,
+
 ) {
 
 	api := router.Group("/api/v1")
@@ -28,11 +31,13 @@ func RegisterRoutes(
 	RegisterUserRoutes(api, userController)
 	RegisterRoleRoutes(api, rolesController)
 	RegisterStoreRoutes(api, storeController)
-	RegisterStoreMemberRoutes(api, storeMemberController)
 	RegisterFavoriteRoutes(api, favoriteController)
 	RegisterAuthRoutes(api, authController)
 	RegisterCartRoutes(api, cartController)
 	RegisterBrandRoutes(api, brandController)
 	RegisterUnitRoutes(api, unitController)
+	RegisterFloorRoutes(api, floorController)
+	RegisterBuildingRoutes(api, buildingController)
+	// RegisterCourierRoutes(api, courierController)
 
 }

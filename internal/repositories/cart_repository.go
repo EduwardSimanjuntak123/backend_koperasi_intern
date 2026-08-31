@@ -31,7 +31,7 @@ func (r *CartRepository) FindCartByUserID(userID string) (*models.Cart, error) {
 	err := r.db.Preload("CartItems").Preload("CartItems.Product").Where("user_id = ?", userID).First(&cart).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("cart not found")
+			return nil, errors.New("keranjang tidak ditemukan")
 		}
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (r *CartRepository) FindCartByUserID(userID string) (*models.Cart, error) {
 	return &cart, nil
 }
 
-// Membuat keranjang baru (biasanya dipanggil jika user baru pertama kali akses keranjang)
+// Membuat keranjang baru (dipanggil otomatis jika user belum pernah memiliki keranjang)
 func (r *CartRepository) CreateCart(cart *models.Cart) error {
 	return r.db.Create(cart).Error
 }
@@ -48,14 +48,15 @@ func (r *CartRepository) CreateCart(cart *models.Cart) error {
 // Operasi untuk model CartItem (Isi Keranjang)
 // =====================================
 
-// Mencari spesifik satu item di dalam keranjang (untuk mengecek apakah barang sudah ada)
+// Mencari item spesifik di dalam keranjang berdasarkan cart_id dan product_id
+// (digunakan untuk mengecek apakah produk sudah ada sebelum menambahkan)
 func (r *CartRepository) FindCartItem(cartID string, productID string) (*models.CartItem, error) {
 	var item models.CartItem
 
 	err := r.db.Where("cart_id = ? AND product_id = ?", cartID, productID).First(&item).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, errors.New("cart item not found")
+			return nil, errors.New("produk belum ada di keranjang")
 		}
 		return nil, err
 	}
@@ -67,8 +68,12 @@ func (r *CartRepository) FindCartItem(cartID string, productID string) (*models.
 func (r *CartRepository) FindCartItemByID(itemID string) (*models.CartItem, error) {
 	var item models.CartItem
 
-	err := r.db.First(&item, itemID).Error
+	// Gunakan .Where() agar aman untuk tipe ID string (menghindari ambiguitas primary key)
+	err := r.db.Where("id = ?", itemID).First(&item).Error
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("item keranjang tidak ditemukan")
+		}
 		return nil, err
 	}
 
@@ -85,9 +90,14 @@ func (r *CartRepository) UpdateCartItemQuantity(itemID string, quantity int) err
 	return r.db.Model(&models.CartItem{}).Where("id = ?", itemID).Update("quantity", quantity).Error
 }
 
-// Menghapus item dari keranjang
+// Menghapus satu item dari keranjang
 func (r *CartRepository) DeleteCartItem(itemID string) error {
-	return r.db.Delete(&models.CartItem{}, itemID).Error
+	return r.db.Where("id = ?", itemID).Delete(&models.CartItem{}).Error
+}
+
+// Menghapus semua item dalam keranjang (clear cart)
+func (r *CartRepository) ClearCartItems(cartID string) error {
+	return r.db.Where("cart_id = ?", cartID).Delete(&models.CartItem{}).Error
 }
 
 func (r *CartRepository) GenerateCartID() (string, error) {

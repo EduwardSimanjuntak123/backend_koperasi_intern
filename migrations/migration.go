@@ -45,12 +45,10 @@ func Run(db *gorm.DB) error {
 		&models.Cart{},
 		&models.CartItem{},
 		&models.Favorite{},
-		&models.PointLocation{},
-		&models.PaymentMethod{},
-		&models.StoreMember{},
-
 		&models.Order{},
 		&models.Order_Item{},
+		&models.Building{},
+		&models.Floor{},
 	)
 
 	if err != nil {

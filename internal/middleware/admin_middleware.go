@@ -9,13 +9,19 @@ import (
 func AdminMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		roleID := c.MustGet("role_id").(uint)
+		roleID, exists := c.Get("role_id")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"success": false,
+				"message": "Tidak terautentikasi: informasi peran pengguna tidak ditemukan",
+			})
+			return
+		}
 
-		// RoleID = 1 adalah Admin
-		if roleID != 1 {
+		if roleID.(uint) != 1 {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"success": false,
-				"message": "Forbidden",
+				"message": "Akses ditolak: hanya admin yang dapat mengakses fitur ini",
 			})
 			return
 		}

@@ -23,5 +23,6 @@ func RegisterCartRoutes(
 		cart.POST("/items", cartController.AddToCart)
 		cart.PUT("/items/:item_id", cartController.UpdateCartItemQuantity)
 		cart.DELETE("/items/:item_id", cartController.RemoveFromCart)
+		cart.DELETE("", cartController.ClearCart) // Mengosongkan seluruh isi keranjang
 	}
 }

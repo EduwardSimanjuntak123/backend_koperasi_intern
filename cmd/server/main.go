@@ -89,8 +89,10 @@ func main() {
 	brandRepo := repositories.NewBrandRepository(db)
 	unitRepo := repositories.NewUnitRepository(db)
 	buildingRepo := repositories.NewBuildingRepository(db)
-	// courierRepo := repositories.NewCourierRepository(db)
+	courierRepo := repositories.NewCourierRepository(db)
 	floorRepo := repositories.NewFloorRepository(db)
+	orderRepo := repositories.NewOrderRepository(db)
+	paymentRepo := repositories.NewPaymentRepository(db)
 
 	// ==============================
 	// Service
@@ -106,8 +108,11 @@ func main() {
 	brandService := services.NewBrandService(brandRepo)
 	unitService := services.NewUnitService(unitRepo)
 	buildingService := services.NewBuildingService(buildingRepo)
-	// courierService := services.NewCourierService(courierRepo)
+	courierService := services.NewCourierService(courierRepo)
 	floorService := services.NewFloorService(floorRepo)
+	orderService := services.NewOrderService(orderRepo, productRepo, cartRepo, paymentRepo, courierRepo)
+	paymentService := services.NewPaymentService(paymentRepo, orderRepo)
+
 	// ==============================
 	// Controller
 	// ==============================
@@ -118,19 +123,20 @@ func main() {
 	rolesController := controllers.NewRolesController(rolesService)
 	storeController := controllers.NewStoreController(storeService)
 	favoriteController := controllers.NewFavoriteController(favoriteService)
-	// courierController := controllers.NewCourierController(courierService)
 	cartController := controllers.NewCartController(cartService)
 	brandController := controllers.NewBrandController(brandService)
 	unitController := controllers.NewUnitController(unitService)
 	buildingController := controllers.NewBuildingController(buildingService)
 	floorController := controllers.NewFloorController(floorService)
+	courierController := controllers.NewCourierController(courierService)
+	orderController := controllers.NewOrderController(orderService)
+	paymentController := controllers.NewPaymentController(paymentService)
 
 	// ==============================
 	// Routes
 	// ==============================
 	routes.RegisterRoutes(
 		r,
-
 		productController,
 		categoryController,
 		userController,
@@ -143,8 +149,11 @@ func main() {
 		brandController,
 		floorController,
 		buildingController,
-		// courierController,
+		courierController,
+		orderController,
+		paymentController,
 	)
+
 	// if err := migrations.SeedProductsFromExcel(db, "assets/products.xlsx"); err != nil {
 	// 	log.Fatal(err)
 	// }

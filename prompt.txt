@@ -1,0 +1,129 @@
+pada sisi admin tambhakna Kelola kurir, Kelola Gedung dan lantai serta biaya pengiriman
+
+berikut apinya
+get Gedung:
+http://localhost:8080/api/v1/buildings
+respon:
+{
+    "data": [
+        {
+            "id": "GD-001",
+            "name": "Gedung 4",
+            "created_at": "2026-08-31T16:04:57.442027+07:00",
+            "updated_at": "2026-08-31T16:04:57.442027+07:00"
+        }
+    ],
+    "message": "Buildings retrieved successfully",
+    "success": true
+} 
+create:http://localhost:8080/api/v1/buildings
+{
+  "name": "Gedung 4"
+}
+respon:
+{
+    "data": {
+        "id": "GD-001",
+        "name": "Gedung 4",
+        "created_at": "2026-08-31T16:04:57.4420273+07:00",
+        "updated_at": "2026-08-31T16:04:57.4420273+07:00"
+    },
+    "message": "Building created successfully",
+    "success": true
+}
+delete: http://localhost:8080/api/v1/floors/fl-002
+respon :
+{
+    "message": "Floor deleted successfully",
+    "success": true
+}
+update:http://localhost:8080/api/v1/buildings/bl-001
+{
+  "name": "Gedung A Barat"
+}
+respon:
+{
+    "data": {
+        "id": "bl-001",
+        "name": "Gedung A Barat",
+        "created_at": "0001-01-01T00:00:00Z",
+        "updated_at": "2026-08-31T14:39:25.3093279+07:00"
+    },
+    "message": "Building updated successfully",
+    "success": true
+}
+
+untuk lantai:
+get:http://localhost:8080/api/v1/floors
+{
+    "data": [
+        {
+            "id": "fl-001",
+            "name": "Lantai 3",
+            "delivery_fee": 10000,
+            "building_id": "bl-001",
+            "building": {
+                "id": "bl-001",
+                "name": "Gedung 1",
+                "created_at": "2026-08-31T14:39:47.534087+07:00",
+                "updated_at": "2026-08-31T14:39:47.534087+07:00"
+            },
+            "created_at": "2026-08-31T14:41:29.888978+07:00",
+            "updated_at": "2026-08-31T14:41:29.888978+07:00"
+        },
+    ],
+    "message": "Floors retrieved successfully",
+    "success": true
+}
+update:http://localhost:8080/api/v1/buildings/bl-001
+body:{
+  "name": "Gedung A Barat"
+}
+respon:
+{
+    "data": {
+        "id": "bl-001",
+        "name": "Gedung A Barat",
+        "created_at": "0001-01-01T00:00:00Z",
+        "updated_at": "2026-08-31T14:39:25.3093279+07:00"
+    },
+    "message": "Building updated successfully",
+    "success": true
+}
+create:{
+  "name": "Gedung 4"
+}
+respon:{
+    "data": {
+        "id": "GD-002",
+        "name": "Gedung 5",
+        "created_at": "2026-08-31T16:09:41.0573237+07:00",
+        "updated_at": "2026-08-31T16:09:41.0573237+07:00"
+    },
+    "message": "Building created successfully",
+    "success": true
+}
+delete:http://localhost:8080/api/v1/buildings/bl-001
+
+untuk kurir
+get:http://localhost:8080/api/v1/couriers
+respon:
+{
+    "data": [
+        {
+            "id": "Co-001",
+            "name": "Kurir Andi",
+            "phone_number": "081234567890",
+            "is_active": true,
+            "created_at": "2026-08-31T16:02:16.999656+07:00",
+            "updated_at": "2026-08-31T16:02:16.999656+07:00"
+        },
+            ],
+    "message": "Couriers retrieved successfully",
+    "success": true
+}
+update dan delete :http://localhost:8080/api/v1/couriers/Co-002
+{
+    "message": "Courier updated successfully",
+    "success": true
+}

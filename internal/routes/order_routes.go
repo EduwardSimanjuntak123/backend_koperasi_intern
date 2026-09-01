@@ -8,42 +8,40 @@ import (
 )
 
 func RegisterOrderRoutes(
-	api *gin.RouterGroup,
+	router *gin.RouterGroup,
 	orderController *controllers.OrderController,
 ) {
-
-	// ======================================
-	// Buyer Routes
-	// ======================================
-
-	buyer := api.Group("/orders")
-
+	// ===========================
+	// BUYER
+	// ===========================
+	buyer := router.Group("/orders")
 	buyer.Use(
 		middleware.AuthMiddleware(),
 		middleware.BuyerMiddleware(),
 	)
-
 	{
 		buyer.GET("", orderController.GetMyOrders)
-		buyer.POST("", orderController.CreateOrder)
-		buyer.GET("/:id", orderController.GetOrderByID)
+		buyer.GET("/:id", orderController.GetByID)
+		buyer.POST("", orderController.Create)
+		buyer.POST("/checkout-cart", orderController.CheckoutCart)
+		buyer.POST("/:id/cancel", orderController.Cancel)
+		buyer.DELETE("/:id", orderController.Cancel)
 	}
 
-	// ======================================
-	// Admin / Store Routes
-	// ======================================
-
-	admin := api.Group("/admin/orders")
-
+	// ===========================
+	// ADMIN / TOKO
+	// ===========================
+	admin := router.Group("/orders")
 	admin.Use(
 		middleware.AuthMiddleware(),
 		middleware.AdminMiddleware(),
 	)
-
 	{
-		admin.GET("", orderController.GetAllOrders)
-		admin.GET("/:id", orderController.GetOrderByID)
-		admin.PUT("/:id", orderController.UpdateOrder)
-		admin.DELETE("/:id", orderController.DeleteOrder)
+		admin.GET("/all", orderController.GetAll)
+		admin.PUT("/:id/status", orderController.UpdateStatus)
+		admin.PATCH("/:id/status", orderController.UpdateStatus)
+		admin.PUT("/:id/courier", orderController.AssignCourier)
+		admin.PATCH("/:id/courier", orderController.AssignCourier)
+		admin.DELETE("/admin/:id", orderController.Delete)
 	}
 }

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"net/http"
+	"strings"
 
 	"backend_koperasi/internal/utils"
 
@@ -11,12 +12,28 @@ import (
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		// Ambil JWT dari HttpOnly Cookie
-		token, err := c.Cookie("access_token")
-		if err != nil {
+		// Cek Authorization header Bearer token atau HttpOnly Cookie
+		var token string
+		authHeader := c.GetHeader("Authorization")
+		if authHeader != "" {
+			if strings.HasPrefix(authHeader, "Bearer ") {
+				token = strings.TrimPrefix(authHeader, "Bearer ")
+			} else {
+				token = authHeader
+			}
+		}
+
+		if token == "" {
+			cookieToken, err := c.Cookie("access_token")
+			if err == nil {
+				token = cookieToken
+			}
+		}
+
+		if token == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": "Unauthorized",
+				"message": "Unauthorized: Token tidak ditemukan. Silakan login atau sertakan Authorization Bearer token.",
 			})
 			return
 		}
@@ -26,7 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 				"success": false,
-				"message": "Invalid token",
+				"message": "Invalid token: " + err.Error(),
 			})
 			return
 		}
@@ -39,3 +56,4 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+

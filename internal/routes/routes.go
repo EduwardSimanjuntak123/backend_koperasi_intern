@@ -20,10 +20,10 @@ func RegisterRoutes(
 	brandController *controllers.BrandController,
 	floorController *controllers.FloorController,
 	buildingController *controllers.BuildingController,
-	// courierController *controllers.CourierController,
-
+	courierController *controllers.CourierController,
+	orderController *controllers.OrderController,
+	paymentController *controllers.PaymentController,
 ) {
-
 	api := router.Group("/api/v1")
 
 	RegisterProductRoutes(api, productController)
@@ -38,6 +38,8 @@ func RegisterRoutes(
 	RegisterUnitRoutes(api, unitController)
 	RegisterFloorRoutes(api, floorController)
 	RegisterBuildingRoutes(api, buildingController)
-	// RegisterCourierRoutes(api, courierController)
-
+	RegisterCourierRoutes(api, courierController)
+	RegisterOrderRoutes(api, orderController)
+	RegisterPaymentRoutes(api, paymentController)
 }
+

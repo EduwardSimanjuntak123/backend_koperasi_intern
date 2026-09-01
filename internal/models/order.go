@@ -15,27 +15,29 @@ const (
 )
 
 type Order struct {
-	ID string `gorm:"primaryKey" json:"id"`
+	ID string `gorm:"primaryKey;size:50" json:"id"`
+
 	// Customer
-	UserID string `gorm:"not null" json:"user_id"`
-	User   User   `gorm:"foreignKey:UserID" json:"user"`
+	UserID string `gorm:"size:50;not null;index" json:"user_id"`
+	User   User   `gorm:"foreignKey:UserID" json:"user,omitempty"`
 
-	CourierID *string  `json:"courier_id"`
-	Courier   *Courier `gorm:"foreignKey:CourierID" json:"courier"`
+	// Courier (Optional)
+	CourierID *string  `gorm:"size:50;index" json:"courier_id"`
+	Courier   *Courier `gorm:"foreignKey:CourierID" json:"courier,omitempty"`
 
-	// Payment
-	Payment *Payment `gorm:"foreignKey:OrderID" json:"payment,omitempty"`
+	// Payment (1-to-1)
+	Payment *Payment `gorm:"foreignKey:OrderID;references:ID" json:"payment,omitempty"`
 
 	// Order Information
-	InvoiceNumber string      `gorm:"size:50;uniqueIndex" json:"invoice_number"`
+	InvoiceNumber string      `gorm:"size:50;uniqueIndex;not null" json:"invoice_number"`
 	Status        OrderStatus `gorm:"size:30;default:'PENDING'" json:"status"`
-	Notes         *string     `json:"notes"`
+	Notes         *string     `gorm:"type:text" json:"notes"`
+
 	// Price Summary
 	Subtotal       float64 `gorm:"not null;default:0" json:"subtotal"`
 	DiscountAmount float64 `gorm:"default:0" json:"discount_amount"`
 	ShippingCost   float64 `gorm:"default:0" json:"shipping_cost"`
-
-	GrandTotal float64 `gorm:"not null;default:0" json:"grand_total"`
+	GrandTotal     float64 `gorm:"not null;default:0" json:"grand_total"`
 
 	// Time
 	PaidAt      *time.Time `json:"paid_at"`
@@ -46,6 +48,7 @@ type Order struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// Relations
-	Items         []OrderItem          `gorm:"foreignKey:OrderID" json:"items,omitempty"`
-	StatusHistory []OrderStatusHistory `gorm:"foreignKey:OrderID" json:"status_history,omitempty"`
+	Items         []OrderItem          `gorm:"foreignKey:OrderID;references:ID" json:"items,omitempty"`
+	StatusHistory []OrderStatusHistory `gorm:"foreignKey:OrderID;references:ID" json:"status_history,omitempty"`
 }
+

@@ -101,9 +101,11 @@ func (ac *AuthController) Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Login berhasil",
+		"token":   token,
 		"data":    user,
 	})
 }
+
 
 // =====================================
 // POST /auth/logout

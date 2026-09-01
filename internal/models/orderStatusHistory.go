@@ -3,10 +3,10 @@ package models
 import "time"
 
 type OrderStatusHistory struct {
-	ID string `gorm:"primaryKey" json:"id"`
+	ID string `gorm:"primaryKey;size:50" json:"id"`
 
-	OrderID string `gorm:"not null;index" json:"order_id"`
-	Order   Order  `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+	OrderID string `gorm:"size:50;not null;index" json:"order_id"`
+	Order   *Order `gorm:"foreignKey:OrderID" json:"order,omitempty"`
 
 	Status string `gorm:"size:50;not null" json:"status"`
 
@@ -16,3 +16,4 @@ type OrderStatusHistory struct {
 
 	CreatedAt time.Time `json:"created_at"`
 }
+

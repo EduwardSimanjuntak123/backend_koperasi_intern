@@ -82,15 +82,15 @@ func (c *CourierController) Create(ctx *gin.Context) {
 	if err := ctx.ShouldBindJSON(&courier); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": err.Error(),
+			"message": "Format data yang dikirim tidak valid.",
 		})
 		return
 	}
 
-	if err := ctx.ShouldBindJSON(&courier); err != nil {
+	if err := c.courierService.Create(&courier); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "Format data yang dikirim tidak valid.",
+			"message": err.Error(),
 		})
 		return
 	}

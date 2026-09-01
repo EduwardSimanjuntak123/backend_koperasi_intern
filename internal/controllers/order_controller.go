@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"backend_koperasi/internal/models"
+	"backend_koperasi/internal/requests"
 	"backend_koperasi/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -20,14 +20,94 @@ func NewOrderController(service *services.OrderService) *OrderController {
 }
 
 // ======================================
-// GET /api/v1/orders
+// POST /api/v1/orders (Create Order)
 // ======================================
 
-func (c *OrderController) GetAllOrders(ctx *gin.Context) {
+func (c *OrderController) Create(ctx *gin.Context) {
+	userID := ctx.GetString("user_id")
+	if userID == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Silakan login terlebih dahulu.",
+		})
+		return
+	}
 
-	orders, err := c.orderService.GetAllOrders()
+	var req requests.CreateOrderRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Format data tidak valid: " + err.Error(),
+		})
+		return
+	}
+
+	order, err := c.orderService.Create(userID, req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Pesanan berhasil dibuat.",
+		"data":    order,
+	})
+}
+
+// ======================================
+// POST /api/v1/orders/checkout-cart
+// ======================================
+
+func (c *OrderController) CheckoutCart(ctx *gin.Context) {
+	userID := ctx.GetString("user_id")
+	if userID == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Silakan login terlebih dahulu.",
+		})
+		return
+	}
+
+	var req requests.CheckoutCartRequest
+	_ = ctx.ShouldBindJSON(&req)
+
+	order, err := c.orderService.CheckoutCart(userID, req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{
+		"success": true,
+		"message": "Pesanan berhasil dibuat dari keranjang belanja.",
+		"data":    order,
+	})
+}
+
+// ======================================
+// GET /api/v1/orders (Buyer's Orders)
+// ======================================
+
+func (c *OrderController) GetMyOrders(ctx *gin.Context) {
+	userID := ctx.GetString("user_id")
+	if userID == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"success": false,
+			"message": "Silakan login terlebih dahulu.",
+		})
+		return
+	}
+
+	orders, err := c.orderService.GetByUserID(userID)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
 		})
@@ -36,20 +116,26 @@ func (c *OrderController) GetAllOrders(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Orders retrieved successfully",
+		"message": "Daftar pesanan Anda berhasil diambil.",
 		"data":    orders,
 	})
 }
 
 // ======================================
-// GET /api/v1/orders/:id
+// GET /api/v1/orders/:id (Detail Order)
 // ======================================
 
-func (c *OrderController) GetOrderByID(ctx *gin.Context) {
-
+func (c *OrderController) GetByID(ctx *gin.Context) {
 	id := ctx.Param("id")
+	userID := ctx.GetString("user_id")
+	roleID, _ := ctx.Get("role_id")
 
-	order, err := c.orderService.GetOrderByID(id)
+	isAdmin := false
+	if rID, ok := roleID.(uint); ok && rID == 1 {
+		isAdmin = true
+	}
+
+	order, err := c.orderService.GetByID(id, userID, isAdmin)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"success": false,
@@ -60,27 +146,53 @@ func (c *OrderController) GetOrderByID(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Order retrieved successfully",
+		"message": "Detail pesanan berhasil diambil.",
 		"data":    order,
 	})
 }
 
 // ======================================
-// GET /api/v1/my-orders
+// POST /api/v1/orders/:id/cancel (Cancel)
 // ======================================
 
-func (c *OrderController) GetMyOrders(ctx *gin.Context) {
-
+func (c *OrderController) Cancel(ctx *gin.Context) {
+	id := ctx.Param("id")
 	userID := ctx.GetString("user_id")
-	if userID == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{
+	roleID, _ := ctx.Get("role_id")
+
+	isAdmin := false
+	if rID, ok := roleID.(uint); ok && rID == 1 {
+		isAdmin = true
+	}
+
+	var req requests.CancelOrderRequest
+	_ = ctx.ShouldBindJSON(&req)
+
+	reason := ""
+	if req.Reason != nil {
+		reason = *req.Reason
+	}
+
+	if err := c.orderService.Cancel(id, userID, reason, isAdmin); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "Unauthorized",
+			"message": err.Error(),
 		})
 		return
 	}
 
-	orders, err := c.orderService.GetOrdersByUser(userID)
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Pesanan berhasil dibatalkan dan stok telah dikembalikan.",
+	})
+}
+
+// ======================================
+// GET /api/v1/orders/all (Admin: All Orders)
+// ======================================
+
+func (c *OrderController) GetAll(ctx *gin.Context) {
+	orders, err := c.orderService.GetAll()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"success": false,
@@ -91,63 +203,34 @@ func (c *OrderController) GetMyOrders(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Orders retrieved successfully",
+		"message": "Seluruh data pesanan berhasil diambil.",
 		"data":    orders,
 	})
 }
 
 // ======================================
-// POST /api/v1/orders
+// PUT /api/v1/orders/:id/status (Admin)
 // ======================================
 
-func (c *OrderController) CreateOrder(ctx *gin.Context) {
-
-	var order models.Order
-
-	if err := ctx.ShouldBindJSON(&order); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": "Invalid request body",
-		})
-		return
-	}
-
-	if err := c.orderService.CreateOrder(&order); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"success": false,
-			"message": err.Error(),
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusCreated, gin.H{
-		"success": true,
-		"message": "Order created successfully",
-		"data":    order,
-	})
-}
-
-// ======================================
-// PUT /api/v1/orders/:id
-// ======================================
-
-func (c *OrderController) UpdateOrder(ctx *gin.Context) {
-
+func (c *OrderController) UpdateStatus(ctx *gin.Context) {
 	id := ctx.Param("id")
+	adminID := ctx.GetString("user_id")
 
-	var order models.Order
-
-	if err := ctx.ShouldBindJSON(&order); err != nil {
+	var req requests.UpdateOrderStatusRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
-			"message": "Invalid request body",
+			"message": "Format data tidak valid: " + err.Error(),
 		})
 		return
 	}
 
-	order.ID = id
+	notes := ""
+	if req.Notes != nil {
+		notes = *req.Notes
+	}
 
-	if err := c.orderService.UpdateOrder(&order); err != nil {
+	if err := c.orderService.UpdateStatus(id, req.Status, notes, adminID); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -157,19 +240,28 @@ func (c *OrderController) UpdateOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Order updated successfully",
+		"message": "Status pesanan berhasil diperbarui.",
 	})
 }
 
 // ======================================
-// DELETE /api/v1/orders/:id
+// PUT /api/v1/orders/:id/courier (Admin)
 // ======================================
 
-func (c *OrderController) DeleteOrder(ctx *gin.Context) {
-
+func (c *OrderController) AssignCourier(ctx *gin.Context) {
 	id := ctx.Param("id")
+	adminID := ctx.GetString("user_id")
 
-	if err := c.orderService.DeleteOrder(id); err != nil {
+	var req requests.AssignCourierRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": "Format data tidak valid: " + err.Error(),
+		})
+		return
+	}
+
+	if err := c.orderService.AssignCourier(id, req.CourierID, adminID); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": err.Error(),
@@ -179,6 +271,27 @@ func (c *OrderController) DeleteOrder(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "Order deleted successfully",
+		"message": "Kurir berhasil ditugaskan untuk pesanan.",
+	})
+}
+
+// ======================================
+// DELETE /api/v1/orders/:id (Admin)
+// ======================================
+
+func (c *OrderController) Delete(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	if err := c.orderService.Delete(id); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Pesanan beserta relasinya berhasil dihapus.",
 	})
 }

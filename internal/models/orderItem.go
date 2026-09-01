@@ -3,15 +3,15 @@ package models
 import "time"
 
 type OrderItem struct {
-	ID string `gorm:"primaryKey" json:"id"`
+	ID string `gorm:"primaryKey;size:50" json:"id"`
 
-	OrderID string `gorm:"not null;index" json:"order_id"`
-	Order   Order  `gorm:"foreignKey:OrderID" json:"order,omitempty"`
+	OrderID string `gorm:"size:50;not null;index" json:"order_id"`
+	Order   *Order `gorm:"foreignKey:OrderID" json:"order,omitempty"`
 
-	ProductID string  `gorm:"not null;index" json:"product_id"`
+	ProductID string  `gorm:"size:50;not null;index" json:"product_id"`
 	Product   Product `gorm:"foreignKey:ProductID" json:"product,omitempty"`
 
-	Qty int `gorm:"not null" json:"qty"`
+	Qty int `gorm:"not null;default:1" json:"qty"`
 
 	Price float64 `gorm:"not null" json:"price"`
 
@@ -24,3 +24,4 @@ type OrderItem struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+

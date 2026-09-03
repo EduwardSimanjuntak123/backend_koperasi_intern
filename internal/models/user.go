@@ -13,6 +13,13 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 	RoleID    uint      `gorm:"not null" json:"role_id"`
 	Role      Roles     `gorm:"foreignKey:RoleID" json:"role"`
+
+	// Relasi Gedung & Lantai (Opsional / Lokasi Default Pengantaran)
+	BuildingID *string   `gorm:"size:50;index" json:"building_id"`
+	Building   *Building `gorm:"foreignKey:BuildingID" json:"building,omitempty"`
+	FloorID    *string   `gorm:"size:50;index" json:"floor_id"`
+	Floor      *Floor    `gorm:"foreignKey:FloorID" json:"floor,omitempty"`
+
 	Stores    []Store   `gorm:"foreignKey:UserID" json:"stores,omitempty"`
 	Favorites []Product `gorm:"many2many:user_favorites;" json:"favorites"`
 }
@@ -20,3 +27,4 @@ type User struct {
 func (User) TableName() string {
 	return "users"
 }
+

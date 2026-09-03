@@ -24,7 +24,7 @@ func (r *UserRepository) FindAll() ([]models.User, error) {
 
 	var users []models.User
 
-	err := r.db.Preload("Role").Find(&users).Error
+	err := r.db.Preload("Role").Preload("Building").Preload("Floor").Find(&users).Error
 
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func (r *UserRepository) FindByID(id string) (*models.User, error) {
 
 	var user models.User
 
-	err := r.db.Preload("Role").First(&user, id).Error
+	err := r.db.Preload("Role").Preload("Building").Preload("Floor").First(&user, "id = ?", id).Error
 
 	if err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func (r *UserRepository) FindByEmail(email string) (*models.User, error) {
 
 	var user models.User
 
-	err := r.db.Preload("Role").
+	err := r.db.Preload("Role").Preload("Building").Preload("Floor").
 		Where("email = ?", email).
 		First(&user).Error
 
@@ -77,7 +77,7 @@ func (r *UserRepository) FindByUsername(username string) (*models.User, error) {
 
 	var user models.User
 
-	err := r.db.Preload("Role").
+	err := r.db.Preload("Role").Preload("Building").Preload("Floor").
 		Where("username = ?", username).
 		First(&user).Error
 

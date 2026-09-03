@@ -21,6 +21,9 @@ func (r *AuthRepository) FindByEmail(email string) (*models.User, error) {
 	var user models.User
 
 	err := r.db.
+		Preload("Role").
+		Preload("Building").
+		Preload("Floor").
 		Where("email = ?", email).
 		First(&user).Error
 
@@ -38,6 +41,8 @@ func (r *AuthRepository) Create(user *models.User) error {
 
 	return r.db.
 		Preload("Role").
+		Preload("Building").
+		Preload("Floor").
 		Where("id = ?", user.ID).
 		First(user).Error
 }
@@ -48,6 +53,8 @@ func (r *AuthRepository) FindByID(id string) (*models.User, error) {
 
 	err := r.db.
 		Preload("Role").
+		Preload("Building").
+		Preload("Floor").
 		Where("id = ?", id).
 		First(&user).Error
 

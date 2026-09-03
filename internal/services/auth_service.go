@@ -13,12 +13,20 @@ import (
 )
 
 type AuthService struct {
-	authRepo *repositories.AuthRepository
+	authRepo     *repositories.AuthRepository
+	buildingRepo *repositories.BuildingRepository
+	floorRepo    *repositories.FloorRepository
 }
 
-func NewAuthService(authRepo *repositories.AuthRepository) *AuthService {
+func NewAuthService(
+	authRepo *repositories.AuthRepository,
+	buildingRepo *repositories.BuildingRepository,
+	floorRepo *repositories.FloorRepository,
+) *AuthService {
 	return &AuthService{
-		authRepo: authRepo,
+		authRepo:     authRepo,
+		buildingRepo: buildingRepo,
+		floorRepo:    floorRepo,
 	}
 }
 func (s *AuthService) GenerateUserID(roleID uint) (string, error) {
@@ -67,6 +75,35 @@ func (s *AuthService) Register(user *models.User) error {
 	}
 	if user.RoleID == 0 {
 		return errors.New("role id is required")
+	}
+
+	// Validasi opsional Gedung & Lantai
+	if user.BuildingID != nil && strings.TrimSpace(*user.BuildingID) == "" {
+		user.BuildingID = nil
+	}
+	if user.FloorID != nil && strings.TrimSpace(*user.FloorID) == "" {
+		user.FloorID = nil
+	}
+
+	if user.BuildingID != nil {
+		building, err := s.buildingRepo.FindByID(*user.BuildingID)
+		if err != nil || building == nil {
+			return errors.New("gedung tidak ditemukan")
+		}
+	}
+
+	if user.FloorID != nil {
+		floor, err := s.floorRepo.FindByID(*user.FloorID)
+		if err != nil || floor == nil {
+			return errors.New("lantai tidak ditemukan")
+		}
+		if user.BuildingID != nil && floor.BuildingID != *user.BuildingID {
+			return errors.New("lantai tidak berada pada gedung yang dipilih")
+		}
+		// Jika building_id kosong tetapi floor_id diisi, otomatis isi building_id dari data lantai
+		if user.BuildingID == nil {
+			user.BuildingID = &floor.BuildingID
+		}
 	}
 
 	// cek email sudah digunakan

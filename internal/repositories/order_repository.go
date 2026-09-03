@@ -29,8 +29,10 @@ func (r *OrderRepository) FindAll() ([]models.Order, error) {
 
 	err := r.db.
 		Preload("User", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, name, username, email, no_hp, role_id")
+			return db.Select("id, name, username, email, no_hp, role_id, building_id, floor_id")
 		}).
+		Preload("User.Building").
+		Preload("User.Floor").
 		Preload("Courier").
 		Preload("Payment").
 		Preload("Items").
@@ -58,8 +60,10 @@ func (r *OrderRepository) FindByID(id string) (*models.Order, error) {
 	err := r.db.
 		Where("id = ?", id).
 		Preload("User", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, name, username, email, no_hp, role_id")
+			return db.Select("id, name, username, email, no_hp, role_id, building_id, floor_id")
 		}).
+		Preload("User.Building").
+		Preload("User.Floor").
 		Preload("Courier").
 		Preload("Payment").
 		Preload("Items").
@@ -85,6 +89,11 @@ func (r *OrderRepository) FindByUserID(userID string) ([]models.Order, error) {
 
 	err := r.db.
 		Where("user_id = ?", userID).
+		Preload("User", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, name, username, email, no_hp, role_id, building_id, floor_id")
+		}).
+		Preload("User.Building").
+		Preload("User.Floor").
 		Preload("Courier").
 		Preload("Payment").
 		Preload("Items").
@@ -112,8 +121,10 @@ func (r *OrderRepository) FindByStatus(status models.OrderStatus) ([]models.Orde
 	err := r.db.
 		Where("status = ?", status).
 		Preload("User", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, name, username, email, no_hp, role_id")
+			return db.Select("id, name, username, email, no_hp, role_id, building_id, floor_id")
 		}).
+		Preload("User.Building").
+		Preload("User.Floor").
 		Preload("Courier").
 		Preload("Payment").
 		Preload("Items").

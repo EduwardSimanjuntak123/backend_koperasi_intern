@@ -36,12 +36,14 @@ func (ac *AuthController) Register(c *gin.Context) {
 	}
 
 	user := models.User{
-		Name:     req.Name,
-		Username: req.Username,
-		Email:    req.Email,
-		Password: req.Password,
-		NoHP:     req.NoHP,
-		RoleID:   req.RoleID,
+		Name:       req.Name,
+		Username:   req.Username,
+		Email:      req.Email,
+		Password:   req.Password,
+		NoHP:       req.NoHP,
+		RoleID:     req.RoleID,
+		BuildingID: req.BuildingID,
+		FloorID:    req.FloorID,
 	}
 
 	if err := ac.authService.Register(&user); err != nil {

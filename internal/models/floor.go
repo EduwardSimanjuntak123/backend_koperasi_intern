@@ -11,6 +11,9 @@ type Floor struct {
 	BuildingID string   `gorm:"not null" json:"building_id"`
 	Building   Building `gorm:"foreignKey:BuildingID" json:"building"`
 
+	Users []User `gorm:"foreignKey:FloorID" json:"users,omitempty"`
+
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+

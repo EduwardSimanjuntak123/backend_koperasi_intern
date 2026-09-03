@@ -97,10 +97,10 @@ func main() {
 	// ==============================
 	// Service
 	// ==============================
-	authService := services.NewAuthService(authRepo)
+	authService := services.NewAuthService(authRepo, buildingRepo, floorRepo)
 	productService := services.NewProductService(productRepo)
 	categoryService := services.NewCategoryProductService(categoryRepo)
-	userService := services.NewUserService(userRepo)
+	userService := services.NewUserService(userRepo, buildingRepo, floorRepo)
 	rolesService := services.NewRolesService(rolesRepo)
 	storeService := services.NewStoreService(storeRepo)
 	favoriteService := services.NewFavoriteService(favoriteRepo)

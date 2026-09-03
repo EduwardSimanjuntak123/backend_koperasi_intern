@@ -11,12 +11,20 @@ import (
 )
 
 type UserService struct {
-	userRepo *repositories.UserRepository
+	userRepo     *repositories.UserRepository
+	buildingRepo *repositories.BuildingRepository
+	floorRepo    *repositories.FloorRepository
 }
 
-func NewUserService(repo *repositories.UserRepository) *UserService {
+func NewUserService(
+	repo *repositories.UserRepository,
+	buildingRepo *repositories.BuildingRepository,
+	floorRepo *repositories.FloorRepository,
+) *UserService {
 	return &UserService{
-		userRepo: repo,
+		userRepo:     repo,
+		buildingRepo: buildingRepo,
+		floorRepo:    floorRepo,
 	}
 }
 
@@ -71,6 +79,34 @@ func (s *UserService) Create(user *models.User) error {
 		return errors.New("role id is required")
 	}
 
+	// Validasi opsional Gedung & Lantai
+	if user.BuildingID != nil && strings.TrimSpace(*user.BuildingID) == "" {
+		user.BuildingID = nil
+	}
+	if user.FloorID != nil && strings.TrimSpace(*user.FloorID) == "" {
+		user.FloorID = nil
+	}
+
+	if user.BuildingID != nil {
+		building, err := s.buildingRepo.FindByID(*user.BuildingID)
+		if err != nil || building == nil {
+			return errors.New("gedung tidak ditemukan")
+		}
+	}
+
+	if user.FloorID != nil {
+		floor, err := s.floorRepo.FindByID(*user.FloorID)
+		if err != nil || floor == nil {
+			return errors.New("lantai tidak ditemukan")
+		}
+		if user.BuildingID != nil && floor.BuildingID != *user.BuildingID {
+			return errors.New("lantai tidak berada pada gedung yang dipilih")
+		}
+		if user.BuildingID == nil {
+			user.BuildingID = &floor.BuildingID
+		}
+	}
+
 	// Username sudah digunakan?
 	existingUsername, _ := s.userRepo.FindByUsername(user.Username)
 	if existingUsername != nil {
@@ -122,6 +158,37 @@ func (s *UserService) Update(id string, user *models.User) error {
 	existing.Email = user.Email
 	existing.NoHP = user.NoHP
 	existing.RoleID = user.RoleID
+
+	// Validasi opsional Gedung & Lantai
+	if user.BuildingID != nil && strings.TrimSpace(*user.BuildingID) == "" {
+		user.BuildingID = nil
+	}
+	if user.FloorID != nil && strings.TrimSpace(*user.FloorID) == "" {
+		user.FloorID = nil
+	}
+
+	if user.BuildingID != nil {
+		building, err := s.buildingRepo.FindByID(*user.BuildingID)
+		if err != nil || building == nil {
+			return errors.New("gedung tidak ditemukan")
+		}
+	}
+
+	if user.FloorID != nil {
+		floor, err := s.floorRepo.FindByID(*user.FloorID)
+		if err != nil || floor == nil {
+			return errors.New("lantai tidak ditemukan")
+		}
+		if user.BuildingID != nil && floor.BuildingID != *user.BuildingID {
+			return errors.New("lantai tidak berada pada gedung yang dipilih")
+		}
+		if user.BuildingID == nil {
+			user.BuildingID = &floor.BuildingID
+		}
+	}
+
+	existing.BuildingID = user.BuildingID
+	existing.FloorID = user.FloorID
 
 	// Update password hanya jika diisi
 	if strings.TrimSpace(user.Password) != "" {

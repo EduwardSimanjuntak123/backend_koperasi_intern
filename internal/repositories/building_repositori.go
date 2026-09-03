@@ -44,7 +44,7 @@ func (r *BuildingRepository) FindByID(id string) (*models.Building, error) {
 
 	err := r.db.
 		Where("id = ?", id).
-		Preload("Building").
+		Preload("Floors").
 		First(&building).Error
 
 	if err != nil {

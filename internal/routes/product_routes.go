@@ -21,6 +21,7 @@ func RegisterProductRoutes(
 	)
 	{
 		admin.POST("", productController.Create)
+		admin.GET("/stock/low", productController.GetLowStock)
 		admin.PUT("/:id", productController.Update)
 		admin.DELETE("/:id", productController.Delete)
 	}

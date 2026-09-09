@@ -1,7 +1,10 @@
 package controllers
 
 import (
+	"math"
 	"net/http"
+	"strconv"
+	"time"
 
 	"backend_koperasi/internal/requests"
 	"backend_koperasi/internal/services"
@@ -206,6 +209,49 @@ func (c *OrderController) GetAll(ctx *gin.Context) {
 		"message": "Seluruh data pesanan berhasil diambil.",
 		"data":    orders,
 	})
+}
+
+func (c *OrderController) GetByStatus(ctx *gin.Context) {
+	page, _ := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	limit, _ := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if limit < 1 {
+		limit = 10
+	}
+	orders, total, err := c.orderService.GetByStatus(ctx.Query("status"), page, limit)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Daftar pesanan berdasarkan status berhasil diambil.",
+		"data":    orders,
+		"meta": gin.H{
+			"page": page, "limit": limit, "total": total,
+			"total_pages": int(math.Ceil(float64(total) / float64(limit))),
+		},
+	})
+}
+
+func (c *OrderController) GetDashboardSummary(ctx *gin.Context) {
+	summary, err := c.orderService.GetDashboardSummary(time.Now())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"success": true, "message": "Ringkasan pesanan berhasil diambil.", "data": summary})
+}
+
+func (c *OrderController) GetTodayRevenue(ctx *gin.Context) {
+	revenue, err := c.orderService.GetTodayRevenue(time.Now())
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"success": true, "message": "Omzet hari ini berhasil diambil.", "data": gin.H{"omzet_hari_ini": revenue}})
 }
 
 // ======================================

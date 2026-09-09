@@ -45,6 +45,60 @@ func (s *OrderService) GetAll() ([]models.Order, error) {
 	return s.orderRepo.FindAll()
 }
 
+func (s *OrderService) GetByStatus(status string, page, limit int) ([]models.Order, int64, error) {
+	parsedStatus := models.OrderStatus(strings.ToUpper(strings.TrimSpace(status)))
+	switch parsedStatus {
+	case models.OrderPending, models.OrderPaid, models.OrderPacking, models.OrderShipping, models.OrderDelivered, models.OrderCompleted, models.OrderCancelled:
+	default:
+		return nil, 0, errors.New("status pesanan tidak valid")
+	}
+	return s.orderRepo.FindByStatusPaginated(parsedStatus, page, limit)
+}
+
+type OrderDashboardSummary struct {
+	PesananBaru    int64   `json:"pesanan_baru"`
+	SedangDiproses int64   `json:"sedang_diproses"`
+	SiapDikirim    int64   `json:"siap_dikirim"`
+	SedangDiantar  int64   `json:"sedang_diantar"`
+	SelesaiHariIni int64   `json:"selesai_hari_ini"`
+	OmzetHariIni   float64 `json:"omzet_hari_ini"`
+}
+
+func (s *OrderService) GetDashboardSummary(now time.Time) (*OrderDashboardSummary, error) {
+	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	end := start.Add(24 * time.Hour)
+	counts, err := s.orderRepo.CountStatuses([]models.OrderStatus{
+		models.OrderPending,
+		models.OrderPacking,
+		models.OrderShipping,
+		models.OrderDelivered,
+	})
+	if err != nil {
+		return nil, err
+	}
+	completed, err := s.orderRepo.CountCompletedToday(start, end)
+	if err != nil {
+		return nil, err
+	}
+	revenue, err := s.orderRepo.SumRevenueToday(start, end)
+	if err != nil {
+		return nil, err
+	}
+	return &OrderDashboardSummary{
+		PesananBaru:    counts[models.OrderPending],
+		SedangDiproses: counts[models.OrderPacking],
+		SiapDikirim:    counts[models.OrderShipping],
+		SedangDiantar:  counts[models.OrderDelivered],
+		SelesaiHariIni: completed,
+		OmzetHariIni:   revenue,
+	}, nil
+}
+
+func (s *OrderService) GetTodayRevenue(now time.Time) (float64, error) {
+	start := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	return s.orderRepo.SumRevenueToday(start, start.Add(24*time.Hour))
+}
+
 // ======================================
 // Get Order By ID
 // ======================================
@@ -146,12 +200,6 @@ func (s *OrderService) Create(userID string, req requests.CreateOrderRequest) (*
 			discount := 0.0
 			subtotalItem := (price - discount) * float64(itemReq.Qty)
 			totalSubtotal += subtotalItem
-
-			// Kurangi stok produk
-			newStock := product.Stock - itemReq.Qty
-			if err := tx.Model(&models.Product{}).Where("id = ?", product.ID).Update("stock", newStock).Error; err != nil {
-				return fmt.Errorf("gagal memperbarui stok produk '%s': %w", product.Name, err)
-			}
 
 			// Generate Item ID
 			oitID, err := s.orderRepo.GenerateOrderItemID()
@@ -329,11 +377,15 @@ func (s *OrderService) UpdateStatus(orderID string, status models.OrderStatus, n
 
 		case models.OrderCancelled:
 			order.CancelledAt = &now
-			// Kembalikan stok produk jika dibatalkan
-			for _, item := range order.Items {
-				_ = tx.Model(&models.Product{}).
-					Where("id = ?", item.ProductID).
-					Update("stock", gorm.Expr("stock + ?", item.Qty)).Error
+			// Order pending belum pernah mengurangi stok.
+			if order.Status != models.OrderPending {
+				for _, item := range order.Items {
+					if err := tx.Model(&models.Product{}).
+						Where("id = ?", item.ProductID).
+						Update("stock", gorm.Expr("stock + ?", item.Qty)).Error; err != nil {
+						return fmt.Errorf("gagal mengembalikan stok produk: %w", err)
+					}
+				}
 			}
 			// Update payment menjadi REFUNDED / FAILED jika ada
 			_ = tx.Model(&models.Payment{}).
@@ -454,12 +506,14 @@ func (s *OrderService) Cancel(orderID string, userID string, reason string, isAd
 		order.Status = models.OrderCancelled
 		order.CancelledAt = &now
 
-		// Kembalikan stok seluruh item produk
-		for _, item := range order.Items {
-			if err := tx.Model(&models.Product{}).
-				Where("id = ?", item.ProductID).
-				Update("stock", gorm.Expr("stock + ?", item.Qty)).Error; err != nil {
-				return fmt.Errorf("gagal mengembalikan stok produk: %w", err)
+		// Stok hanya dikembalikan jika sebelumnya sudah dibayar.
+		if order.Status != models.OrderPending {
+			for _, item := range order.Items {
+				if err := tx.Model(&models.Product{}).
+					Where("id = ?", item.ProductID).
+					Update("stock", gorm.Expr("stock + ?", item.Qty)).Error; err != nil {
+					return fmt.Errorf("gagal mengembalikan stok produk: %w", err)
+				}
 			}
 		}
 

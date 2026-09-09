@@ -11,6 +11,7 @@ import (
 	"backend_koperasi/internal/requests"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type PaymentService struct {
@@ -171,6 +172,9 @@ func (s *PaymentService) Pay(req requests.PayOrderRequest, verifiedBy string) (*
 		if order.Status == models.OrderCancelled {
 			return errors.New("pesanan sudah dibatalkan, tidak dapat dibayar")
 		}
+		if order.Status == models.OrderPaid || order.Status == models.OrderCompleted {
+			return errors.New("pesanan ini sudah dibayar")
+		}
 
 		now := time.Now()
 
@@ -204,6 +208,9 @@ func (s *PaymentService) Pay(req requests.PayOrderRequest, verifiedBy string) (*
 				return err
 			}
 		} else {
+			if payment.Status == models.PaymentPaid {
+				return errors.New("pesanan ini sudah dibayar")
+			}
 			// Update entri payment yang sudah ada
 			if req.Method != nil && *req.Method != "" {
 				payment.Method = *req.Method
@@ -219,6 +226,28 @@ func (s *PaymentService) Pay(req requests.PayOrderRequest, verifiedBy string) (*
 
 			if err := tx.Save(&payment).Error; err != nil {
 				return err
+			}
+		}
+
+		// Kunci dan kurangi stok secara atomik saat pembayaran dikonfirmasi.
+		var items []models.OrderItem
+		if err := tx.Where("order_id = ?", order.ID).Find(&items).Error; err != nil {
+			return err
+		}
+		for _, item := range items {
+			var product models.Product
+			if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+				Where("id = ?", item.ProductID).First(&product).Error; err != nil {
+				return errors.New("produk pesanan tidak ditemukan")
+			}
+			result := tx.Model(&models.Product{}).
+				Where("id = ? AND stock >= ?", item.ProductID, item.Qty).
+				Update("stock", gorm.Expr("stock - ?", item.Qty))
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected == 0 {
+				return errors.New("Maaf, stok habis karena sudah dibeli pelanggan lain.")
 			}
 		}
 

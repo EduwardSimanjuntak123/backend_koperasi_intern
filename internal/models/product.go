@@ -24,8 +24,6 @@ type ProductFilter struct {
 	StoreID           *string
 	MinPrice          *float64
 	MaxPrice          *float64
-	MinStock          *int
-	MaxStock          *int
 	InventoryMovement *InventoryMovement
 	Badge             *ProductBadge
 	StockStatus       string
@@ -55,9 +53,7 @@ type Product struct {
 	PromotionPrice *float64 `json:"promotion_price"`
 
 	// Stock
-	Stock    int  `gorm:"not null;default:0" json:"stock"`
-	MinStock *int `json:"min_stock"`
-	MaxStock *int `json:"max_stock"`
+	Stock int `gorm:"not null;default:0" json:"stock"`
 
 	// Inventory
 	InventoryMovement *InventoryMovement `gorm:"default:'FAST_MOVING'" json:"inventory_movement"`
@@ -69,8 +65,8 @@ type Product struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// Relation
-	BrandID *string  `json:"brand_id"`
-	Brand   *Brand `gorm:"foreignKey:BrandID" json:"brand"`
+	BrandID *string `json:"brand_id"`
+	Brand   *Brand  `gorm:"foreignKey:BrandID" json:"brand"`
 
 	UnitID     *string          `json:"unit_id"`
 	Unit       *Unit            `gorm:"foreignKey:UnitID" json:"unit"`
@@ -80,5 +76,5 @@ type Product struct {
 	Favorites []Product `gorm:"many2many:user_favorites;"`
 
 	StoreID string `gorm:"not null" json:"store_id"`
-	Store   Store `gorm:"foreignKey:StoreID" json:"store"`
+	Store   Store  `gorm:"foreignKey:StoreID" json:"store"`
 }

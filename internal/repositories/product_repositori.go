@@ -67,15 +67,6 @@ func (r *ProductRepository) FindAll(
 		query = query.Where("price <= ?", *filter.MaxPrice)
 	}
 
-	// Stock
-	if filter.MinStock != nil {
-		query = query.Where("stock >= ?", *filter.MinStock)
-	}
-
-	if filter.MaxStock != nil {
-		query = query.Where("stock <= ?", *filter.MaxStock)
-	}
-
 	// Inventory movement
 	if filter.InventoryMovement != nil {
 		query = query.Where(
@@ -98,9 +89,7 @@ func (r *ProductRepository) FindAll(
 		query = query.Where("stock > ?", 0)
 
 	case "low_stock":
-		query = query.Where(
-			"min_stock IS NOT NULL AND stock <= min_stock",
-		)
+		query = query.Where("stock <= ?", 3)
 	}
 
 	// Expired

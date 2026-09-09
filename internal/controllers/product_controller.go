@@ -63,6 +63,38 @@ func (c *ProductController) GetAll(ctx *gin.Context) {
 	})
 }
 
+func (c *ProductController) GetLowStock(ctx *gin.Context) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	if err != nil || limit < 1 {
+		limit = 10
+	}
+
+	products, total, err := c.productService.GetAll(models.ProductFilter{
+		StockStatus: "low_stock",
+		Page:        page,
+		Limit:       limit,
+		SortBy:      "stock",
+		SortOrder:   "asc",
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Produk dengan stok menipis berhasil diambil.",
+		"data":    products,
+		"meta": gin.H{
+			"page": page, "limit": limit, "total": total,
+			"total_pages": int(math.Ceil(float64(total) / float64(limit))),
+		},
+	})
+}
+
 func (c *ProductController) GetByID(ctx *gin.Context) {
 
 	id := ctx.Param("id")

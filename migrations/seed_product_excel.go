@@ -205,16 +205,6 @@ func SeedProductsFromExcel(db *gorm.DB, filePath string) error {
 
 		product.Stock = parseInt(col(16))
 
-		min := parseInt(col(13))
-		if min > 0 {
-			product.MinStock = &min
-		}
-
-		max := parseInt(col(14))
-		if max > 0 {
-			product.MaxStock = &max
-		}
-
 		// =========================
 		// Expired
 		// =========================

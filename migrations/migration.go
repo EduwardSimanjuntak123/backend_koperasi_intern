@@ -60,6 +60,15 @@ func Run(db *gorm.DB) error {
 		return err
 	}
 
+	if err := db.Exec(`
+		ALTER TABLE products
+		DROP COLUMN IF EXISTS min_stock,
+		DROP COLUMN IF EXISTS max_stock
+	`).Error; err != nil {
+		log.Println("Removing obsolete stock columns failed:", err)
+		return err
+	}
+
 	log.Println("Migration completed successfully")
 
 	return nil

@@ -38,6 +38,9 @@ func RegisterOrderRoutes(
 	)
 	{
 		admin.GET("/all", orderController.GetAll)
+		admin.GET("/admin/by-status", orderController.GetByStatus)
+		admin.GET("/dashboard/summary", orderController.GetDashboardSummary)
+		admin.GET("/dashboard/revenue/today", orderController.GetTodayRevenue)
 		admin.PUT("/:id/status", orderController.UpdateStatus)
 		admin.PATCH("/:id/status", orderController.UpdateStatus)
 		admin.PUT("/:id/courier", orderController.AssignCourier)

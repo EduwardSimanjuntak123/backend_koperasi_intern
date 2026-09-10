@@ -39,6 +39,7 @@ func RegisterOrderRoutes(
 	{
 		admin.GET("/all", orderController.GetAll)
 		admin.GET("/admin/by-status", orderController.GetByStatus)
+		admin.GET("/admin/:id", orderController.GetAdminByID)
 		admin.GET("/dashboard/summary", orderController.GetDashboardSummary)
 		admin.GET("/dashboard/revenue/today", orderController.GetTodayRevenue)
 		admin.PUT("/:id/status", orderController.UpdateStatus)

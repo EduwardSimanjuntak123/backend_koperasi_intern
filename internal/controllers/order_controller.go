@@ -154,6 +154,25 @@ func (c *OrderController) GetByID(ctx *gin.Context) {
 	})
 }
 
+// GET /api/v1/orders/admin/:id (Admin: Detail Order)
+func (c *OrderController) GetAdminByID(ctx *gin.Context) {
+	id := ctx.Param("id")
+	order, err := c.orderService.GetByID(id, "", true)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"success": false,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Detail pesanan berhasil diambil.",
+		"data":    order,
+	})
+}
+
 // ======================================
 // POST /api/v1/orders/:id/cancel (Cancel)
 // ======================================

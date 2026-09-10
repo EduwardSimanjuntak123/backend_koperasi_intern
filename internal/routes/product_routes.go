@@ -12,6 +12,8 @@ func RegisterProductRoutes(
 	router *gin.RouterGroup,
 	productController *controllers.ProductController,
 ) {
+	router.GET("/products/discounted", productController.GetDiscounted)
+	router.GET("/products/best-selling", productController.GetBestSelling)
 	router.GET("/products", productController.GetAll)
 	router.GET("/products/:id", productController.GetByID)
 	admin := router.Group("/products")

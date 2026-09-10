@@ -56,6 +56,56 @@ func (c *ProductController) GetAll(ctx *gin.Context) {
 	})
 }
 
+func (c *ProductController) GetDiscounted(ctx *gin.Context) {
+	filter, err := productFilterFromQuery(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	products, total, err := c.productService.GetDiscounted(filter)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Produk diskon berhasil diambil.",
+		"data":    products,
+		"meta": gin.H{
+			"page": filter.Page, "limit": filter.Limit, "total": total,
+			"total_pages": int(math.Ceil(float64(total) / float64(filter.Limit))),
+		},
+	})
+}
+
+func (c *ProductController) GetBestSelling(ctx *gin.Context) {
+	filter, err := productFilterFromQuery(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+	periodDays, err := queryInt(ctx, "period_days", 30)
+	if err != nil || periodDays < 1 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "parameter period_days harus berupa angka positif"})
+		return
+	}
+
+	products, err := c.productService.GetBestSelling(filter, periodDays)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Produk terlaris berhasil diambil.",
+		"data":    products,
+		"meta":    gin.H{"limit": filter.Limit, "period_days": periodDays},
+	})
+}
+
 func productFilterFromQuery(ctx *gin.Context) (models.ProductFilter, error) {
 	page, err := queryInt(ctx, "page", 1)
 	if err != nil || page < 1 {

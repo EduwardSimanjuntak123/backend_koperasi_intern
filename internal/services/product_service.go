@@ -25,6 +25,14 @@ func (s *ProductService) GetAll(filter models.ProductFilter) ([]models.Product, 
 	return s.productRepo.FindAll(filter)
 }
 
+func (s *ProductService) GetDiscounted(filter models.ProductFilter) ([]models.Product, int64, error) {
+	return s.productRepo.FindDiscounted(filter)
+}
+
+func (s *ProductService) GetBestSelling(filter models.ProductFilter, periodDays int) ([]models.ProductSales, error) {
+	return s.productRepo.FindBestSelling(filter, periodDays)
+}
+
 func (s *ProductService) GetByID(id string) (*models.Product, error) {
 
 	if strings.TrimSpace(id) == "" {

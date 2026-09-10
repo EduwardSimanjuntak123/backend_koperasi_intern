@@ -37,6 +37,11 @@ type ProductFilter struct {
 	SortOrder string
 }
 
+type ProductSales struct {
+	Product   Product `json:"product"`
+	TotalSold int     `json:"total_sold"`
+}
+
 type Product struct {
 	ID string `gorm:"primaryKey" json:"id"`
 

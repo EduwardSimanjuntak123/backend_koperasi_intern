@@ -176,6 +176,103 @@ func (r *ProductRepository) FindAll(
 	return products, total, nil
 }
 
+func (r *ProductRepository) FindDiscounted(filter models.ProductFilter) ([]models.Product, int64, error) {
+	var products []models.Product
+	var total int64
+
+	query := r.db.Model(&models.Product{}).
+		Where("promotion_price IS NOT NULL AND promotion_price > 0 AND promotion_price < price")
+
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	query = query.Order("products.created_at DESC").
+		Preload("Brand").Preload("Unit").Preload("Category").Preload("Store").
+		Offset((filter.Page - 1) * filter.Limit).Limit(filter.Limit)
+
+	if err := query.Find(&products).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return products, total, nil
+}
+
+func (r *ProductRepository) FindBestSelling(filter models.ProductFilter, periodDays int) ([]models.ProductSales, error) {
+	type salesRow struct {
+		ProductID string
+		TotalSold int
+	}
+
+	query := r.db.Table("products AS p").
+		Select("p.id AS product_id, COALESCE(SUM(oi.qty), 0) AS total_sold").
+		Joins("JOIN order_items AS oi ON oi.product_id = p.id").
+		Joins("JOIN orders AS o ON o.id = oi.order_id").
+		Where("o.status IN ?", []models.OrderStatus{
+			models.OrderPaid, models.OrderPacking, models.OrderShipping,
+			models.OrderDelivered, models.OrderCompleted,
+		}).
+		Where("o.created_at >= ?", time.Now().AddDate(0, 0, -periodDays))
+
+	if filter.Search != "" {
+		search := "%" + filter.Search + "%"
+		query = query.Where("(p.name ILIKE ? OR p.sku ILIKE ? OR p.barcode ILIKE ?)", search, search, search)
+	}
+	if filter.BrandID != nil {
+		query = query.Where("p.brand_id = ?", *filter.BrandID)
+	}
+	if filter.CategoryID != nil {
+		query = query.Where("p.category_id = ?", *filter.CategoryID)
+	}
+	if filter.UnitID != nil {
+		query = query.Where("p.unit_id = ?", *filter.UnitID)
+	}
+	if filter.StoreID != nil {
+		query = query.Where("p.store_id = ?", *filter.StoreID)
+	}
+	if filter.MinPrice != nil {
+		query = query.Where("p.price >= ?", *filter.MinPrice)
+	}
+	if filter.MaxPrice != nil {
+		query = query.Where("p.price <= ?", *filter.MaxPrice)
+	}
+	if filter.StockStatus == "in_stock" {
+		query = query.Where("p.stock > 0")
+	} else if filter.StockStatus == "out_of_stock" {
+		query = query.Where("p.stock <= 0")
+	} else if filter.StockStatus == "low_stock" {
+		query = query.Where("p.stock <= 3")
+	}
+
+	var rows []salesRow
+	if err := query.Group("p.id").Order("total_sold DESC, p.created_at DESC").Limit(filter.Limit).Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+	if len(rows) == 0 {
+		return []models.ProductSales{}, nil
+	}
+
+	ids := make([]string, 0, len(rows))
+	for _, row := range rows {
+		ids = append(ids, row.ProductID)
+	}
+	var products []models.Product
+	if err := r.db.Preload("Brand").Preload("Unit").Preload("Category").Preload("Store").Where("id IN ?", ids).Find(&products).Error; err != nil {
+		return nil, err
+	}
+	productByID := make(map[string]models.Product, len(products))
+	for _, product := range products {
+		productByID[product.ID] = product
+	}
+	result := make([]models.ProductSales, 0, len(rows))
+	for _, row := range rows {
+		if product, ok := productByID[row.ProductID]; ok {
+			result = append(result, models.ProductSales{Product: product, TotalSold: row.TotalSold})
+		}
+	}
+	return result, nil
+}
+
 func (r *ProductRepository) FindByID(id string) (*models.Product, error) {
 
 	var product models.Product

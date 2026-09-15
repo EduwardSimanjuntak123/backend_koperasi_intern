@@ -198,7 +198,7 @@ func (r *ProductRepository) FindDiscounted(filter models.ProductFilter) ([]model
 	return products, total, nil
 }
 
-func (r *ProductRepository) FindBestSelling(filter models.ProductFilter, periodDays int) ([]models.ProductSales, error) {
+func (r *ProductRepository) FindBestSelling(filter models.ProductFilter, periodDays int) ([]models.Product, error) {
 	type salesRow struct {
 		ProductID string
 		TotalSold int
@@ -249,7 +249,7 @@ func (r *ProductRepository) FindBestSelling(filter models.ProductFilter, periodD
 		return nil, err
 	}
 	if len(rows) == 0 {
-		return []models.ProductSales{}, nil
+		return []models.Product{}, nil
 	}
 
 	ids := make([]string, 0, len(rows))
@@ -264,10 +264,11 @@ func (r *ProductRepository) FindBestSelling(filter models.ProductFilter, periodD
 	for _, product := range products {
 		productByID[product.ID] = product
 	}
-	result := make([]models.ProductSales, 0, len(rows))
+	result := make([]models.Product, 0, len(rows))
 	for _, row := range rows {
 		if product, ok := productByID[row.ProductID]; ok {
-			result = append(result, models.ProductSales{Product: product, TotalSold: row.TotalSold})
+			product.TotalSold = row.TotalSold
+			result = append(result, product)
 		}
 	}
 	return result, nil

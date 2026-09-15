@@ -29,7 +29,7 @@ func (s *ProductService) GetDiscounted(filter models.ProductFilter) ([]models.Pr
 	return s.productRepo.FindDiscounted(filter)
 }
 
-func (s *ProductService) GetBestSelling(filter models.ProductFilter, periodDays int) ([]models.ProductSales, error) {
+func (s *ProductService) GetBestSelling(filter models.ProductFilter, periodDays int) ([]models.Product, error) {
 	return s.productRepo.FindBestSelling(filter, periodDays)
 }
 

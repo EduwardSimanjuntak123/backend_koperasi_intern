@@ -43,7 +43,8 @@ type ProductSales struct {
 }
 
 type Product struct {
-	ID string `gorm:"primaryKey" json:"id"`
+	ID        string `gorm:"primaryKey" json:"id"`
+	TotalSold int    `gorm:"-" json:"total_sold,omitempty"`
 
 	// Basic
 	Name    string  `gorm:"not null" json:"name"`

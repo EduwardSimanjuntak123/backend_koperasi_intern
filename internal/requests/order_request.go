@@ -10,7 +10,6 @@ type OrderItemRequest struct {
 
 type CreateOrderRequest struct {
 	Items          []OrderItemRequest    `json:"items"`
-	CourierID      *string               `json:"courier_id"`
 	PaymentMethod  *models.PaymentMethod `json:"payment_method"`
 	ShippingCost   float64               `json:"shipping_cost"`
 	DiscountAmount float64               `json:"discount_amount"`
@@ -18,7 +17,6 @@ type CreateOrderRequest struct {
 }
 
 type CheckoutCartRequest struct {
-	CourierID      *string               `json:"courier_id"`
 	PaymentMethod  *models.PaymentMethod `json:"payment_method"`
 	ShippingCost   float64               `json:"shipping_cost"`
 	DiscountAmount float64               `json:"discount_amount"`

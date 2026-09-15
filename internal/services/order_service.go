@@ -163,14 +163,6 @@ func (s *OrderService) Create(userID string, req requests.CreateOrderRequest) (*
 			return fmt.Errorf("gagal membuat nomor invoice: %w", err)
 		}
 
-		// 2. Validasi Kurir jika dipilih
-		if req.CourierID != nil && strings.TrimSpace(*req.CourierID) != "" {
-			var courier models.Courier
-			if err := tx.Where("id = ?", *req.CourierID).First(&courier).Error; err != nil {
-				return errors.New("Kurir yang dipilih tidak ditemukan")
-			}
-		}
-
 		var (
 			orderItems    []models.OrderItem
 			totalSubtotal float64
@@ -234,7 +226,7 @@ func (s *OrderService) Create(userID string, req requests.CreateOrderRequest) (*
 		order := models.Order{
 			ID:             orderID,
 			UserID:         userID,
-			CourierID:      req.CourierID,
+			CourierID:      nil,
 			InvoiceNumber:  invoiceNo,
 			Status:         models.OrderPending,
 			Notes:          req.Notes,
@@ -323,7 +315,6 @@ func (s *OrderService) CheckoutCart(userID string, req requests.CheckoutCartRequ
 
 	createReq := requests.CreateOrderRequest{
 		Items:          items,
-		CourierID:      req.CourierID,
 		PaymentMethod:  req.PaymentMethod,
 		ShippingCost:   req.ShippingCost,
 		DiscountAmount: req.DiscountAmount,

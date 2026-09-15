@@ -152,6 +152,12 @@ func (s *OrderService) Create(userID string, req requests.CreateOrderRequest) (*
 	var createdOrder models.Order
 
 	err := db.Transaction(func(tx *gorm.DB) error {
+		// Serialize order number generation so concurrent checkouts cannot receive
+		// the same MAX + 1 order ID or COUNT + 1 invoice number.
+		if err := tx.Exec("SELECT pg_advisory_xact_lock(?)", int64(1)).Error; err != nil {
+			return fmt.Errorf("gagal mengunci generator nomor pesanan: %w", err)
+		}
+
 		// 1. Generate Order ID & Invoice Number
 		orderID, err := s.orderRepo.GenerateNextID()
 		if err != nil {
